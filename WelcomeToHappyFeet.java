@@ -37,43 +37,50 @@ public class WelcomeToHappyFeet extends JComponent implements Runnable {
     }
 
     public void run() {
-       frame = new JFrame("Happy Feet");
-       Container pane = frame.getContentPane();
-       pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-       pane.setLayout(new GridBagLayout());
-       GridBagConstraints c = new GridBagConstraints();
-       if (shouldFill) {
-           c.fill = GridBagConstraints.HORIZONTAL;
-       }
+        frame = new JFrame("Happy Feet");
+        Container pane = frame.getContentPane();
+        pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        pane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        if (shouldFill) {
+            c.fill = GridBagConstraints.HORIZONTAL;
+        }
 
-       welcomeMessage = new JLabel("Welcome to Happy Feet");
-       logInButton = new JButton("Log In");
-       logInButton.addActionListener(actionListener);
-       createAccountButton = new JButton("Create An Account");
-       createAccountButton.addActionListener(actionListener);
+        welcomeMessage = new JLabel("Welcome to Happy Feet");
+        welcomeMessage.setFont(new Font("Serif", Font.PLAIN, 30));
+        logInButton = new JButton("Log In");
+        logInButton.addActionListener(actionListener);
+        createAccountButton = new JButton("Create An Account");
+        createAccountButton.addActionListener(actionListener);
 
-       frame.setSize(600, 400);
-       frame.setLocationRelativeTo(null);
-       frame.setVisible(true);
+        frame.setSize(600, 400);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
-       if (shouldWeightX) {
-           c.weightx = 0.0;
-       }
-       JPanel textPanel = new JPanel();
-       textPanel.add(welcomeMessage);
-       c.fill = GridBagConstraints.HORIZONTAL;
-       c.gridx = 0;
-       c.gridy = 0;
-       pane.add(textPanel, c);
+        if (shouldWeightX) {
+            c.weightx = 0.0;
+        }
+        c.insets = new Insets(6,6,6,6);
+        JPanel textPanel = new JPanel();
+        textPanel.add(welcomeMessage);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        pane.add(textPanel, c);
 
-       JPanel buttonPanel = new JPanel();
-       buttonPanel.add(logInButton);
-       buttonPanel.add(createAccountButton);
-       c.fill = GridBagConstraints.HORIZONTAL;
-       c.weightx = 0.0;
-       c.gridx = 0;
-       c.gridy = 1;
-       pane.add(buttonPanel,c);
+        JPanel buttonPanel = new JPanel();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.0;
+        c.gridx = 0;
+        c.gridy = 1;
+        pane.add(logInButton,c);
+
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.0;
+        c.gridx = 0;
+        c.gridy = 2;
+        pane.add(createAccountButton,c);
     }
 
     public static void main(String[] args) {
