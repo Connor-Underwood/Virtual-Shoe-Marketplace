@@ -143,6 +143,7 @@ public class SellerGUI extends JComponent implements Runnable {
         c.gridx = 0;
         c.gridy = 9;
         pane.add(exportProducts, c);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
 
