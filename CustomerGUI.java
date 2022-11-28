@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CutomerGUI extends JComponent implements Runnable {
+public class CustomerGUI extends JComponent implements Runnable {
     JButton ViewMarket;
     JButton SearchMarket;
     JButton ReviewPurchaseHistory;
