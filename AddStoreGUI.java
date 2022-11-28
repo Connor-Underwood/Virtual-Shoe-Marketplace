@@ -46,8 +46,8 @@ public class AddStoreGUI extends JComponent implements Runnable {
         }
 
         welcomeMessage = new JLabel("What is the name of the store you would like to add?");
-        welcomeMessage.setFont(new Font("Times new Roman", Font.PLAIN, 30));
-        storeNameField = new JTextField();
+        welcomeMessage.setFont(new Font("Times new Roman", Font.PLAIN, 25));
+        storeNameField = new JTextField(5);
         storeNameField.addActionListener(actionListener);
 
         frame.setSize(600, 400);
@@ -71,6 +71,7 @@ public class AddStoreGUI extends JComponent implements Runnable {
         c.gridx = 0;
         c.gridy = 1;
         pane.add(storeNameField,c);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
     }
