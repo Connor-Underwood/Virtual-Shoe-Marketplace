@@ -83,6 +83,7 @@ public class WelcomePageGUI extends JComponent implements Runnable {
         c.weightx = 0.0;
         c.gridx = 0;
         c.gridy = 2;
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pane.add(createAccountButton,c);
     }
 
