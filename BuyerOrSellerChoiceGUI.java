@@ -50,7 +50,7 @@ public class BuyerOrSellerChoiceGUI extends JComponent implements Runnable {
         }
 
         welcomeMessage = new JLabel("What are you creating this account for?");
-        welcomeMessage.setFont(new Font("Serif", Font.PLAIN, 30));
+        welcomeMessage.setFont(new Font("Times new Roman", Font.PLAIN, 30));
         BuyerButton = new JButton("To buy");
         BuyerButton.addActionListener(actionListener);
         SellerButton = new JButton("To sell");
