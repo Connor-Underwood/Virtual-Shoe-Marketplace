@@ -1,49 +1,46 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.*;
 
 // Client class
-class Client {
+public class Client implements Runnable{
+    private PrintWriter writer;
+    private BufferedReader reader;
+    // find some way to differentiate clients in server
 
-    // driver code
-    public static void main(String[] args)
-    {
-        // establish a connection by providing host and port
-        // number
-        try (Socket socket = new Socket("localhost", 1234)) {
+    @Override
+    public void run() {
+        
+    }
 
+    //public static void main(String[] args) {
+    public static void main(String[] args) {
+        try {
+            Socket socket = new Socket("localhost", 1234);
+            
             // writing to server
-            PrintWriter out = new PrintWriter(
+            PrintWriter writer = new PrintWriter(
                     socket.getOutputStream(), true);
 
             // reading from server
-            BufferedReader in
-                    = new BufferedReader(new InputStreamReader(
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
 
-            // object of scanner class
-            Scanner sc = new Scanner(System.in);
-            String line = null;
 
-            while (!"exit".equalsIgnoreCase(line)) {
+            // request format to send to server: "Login: {username} {password}"
 
-                // reading from user
-                line = sc.nextLine();
+            
 
-                // sending the user input to server
-                out.println(line);
-                out.flush();
-
-                // displaying server reply
-                System.out.println("Server replied "
-                        + in.readLine());
-            }
-
-            // closing the scanner object
-            sc.close();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
+        // establish a connection by providing host and port
+        // number
+
+
+
+
 }
