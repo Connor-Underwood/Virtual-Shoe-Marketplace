@@ -48,7 +48,7 @@ public class BuyerOrSellerChoiceGUI extends JComponent implements Runnable {
         if (shouldFill) {
             c.fill = GridBagConstraints.HORIZONTAL;
         }
-
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         welcomeMessage = new JLabel("What are you creating this account for?");
         welcomeMessage.setFont(new Font("Times new Roman", Font.PLAIN, 30));
         BuyerButton = new JButton("To buy");
