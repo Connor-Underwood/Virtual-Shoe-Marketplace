@@ -79,7 +79,7 @@ public class LoginGUI extends JComponent implements Runnable {
         c.gridx = 0;
         c.gridy = 1;
         pane.add(textPanel, c);
-
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
