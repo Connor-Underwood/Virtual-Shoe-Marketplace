@@ -111,7 +111,7 @@ public class CustomerGUI extends JComponent implements Runnable {
         ViewMarketStatistics = new JButton("8: View Market Statistics");
         ViewMarketStatistics.setFont(new Font("Times New Roman", Font.PLAIN, 12));
         ViewMarketStatistics.addActionListener(actionListener);
-
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         c.insets = new Insets(5,5,5,5);
 
         c.fill = GridBagConstraints.HORIZONTAL;
