@@ -10,6 +10,7 @@ public class GUI extends JComponent implements Runnable  {
     // General Frame
     JFrame frame;
     Container pane;
+    JButton backButton;
 
     // Welcome Panel Layout
     JLabel welcomeLabel;
@@ -39,9 +40,8 @@ public class GUI extends JComponent implements Runnable  {
     JLabel createHappyFeetAccount;
     JLabel enterEmail;
     JLabel enterPassword;
-
-    JLabel userTypePrompt;
-    JTextField userType;
+    JLabel userTypes;
+    JComboBox<String> sellerOrCustomer;
     //
 
     boolean login = false;
@@ -58,16 +58,12 @@ public class GUI extends JComponent implements Runnable  {
            if (e.getSource() == welcomeCreateAccountButton) {
                welcomePageNonVisible();
                setCreateAccountPageVisible();
-               createAccount = true;
            }
-           if (e.getSource() == loginButton) {
-               // check if info correct
-//               System.out.println(username.getText());
-//               System.out.println(String.valueOf(password.getPassword()));
-               login = true;
-           }
+//           if (e.getSource() == loginButton) {
+//               login = true;
+//           }
            if (e.getSource() == createAccountButton) {
-               // check if info correct
+               createAccount = true;
            }
 
         }
@@ -79,7 +75,25 @@ public class GUI extends JComponent implements Runnable  {
     public void welcomePageNonVisible() {
         welcomePanel.setVisible(false);
     }
+    public void setWelcomePageVisible() {
+        // Welcome-Page GUI
+        welcomePanel = new JPanel();
+        welcomeLoginButton = new JButton("Log in.");
+        welcomeLoginButton.addActionListener(actionListener);
 
+        welcomeCreateAccountButton = new JButton("Create An Account.");
+        welcomeCreateAccountButton.addActionListener(actionListener);
+
+        welcomeLabel = new JLabel("Welcome to Happy Feet");
+        welcomeLabel.setFont(new Font("Serif", Font.PLAIN, 30));
+
+        welcomePanel.add(welcomeLabel);
+        welcomePanel.add(welcomeLoginButton);
+        welcomePanel.add(welcomeCreateAccountButton);
+        welcomePanel.setVisible(true);
+        pane.add(welcomePanel);
+        // End of Welcome-Page GUI
+    }
     public void setLoginPageVisible() {
         username = new JTextField(5);
         password = new JPasswordField(5);
@@ -88,17 +102,32 @@ public class GUI extends JComponent implements Runnable  {
         passwordLabel = new JLabel("Password:");
         passwordLabel.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         loginButton = new JButton("Login");
-        loginButton.addActionListener(actionListener);
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                login = true;
+            }
+        });
+        backButton = new JButton("Back");
         loginPanel = new JPanel();
         loginPanel.add(userLabel);
         loginPanel.add(username);
         loginPanel.add(passwordLabel);
         loginPanel.add(password);
         loginPanel.add(loginButton);
+        loginPanel.add(backButton);
         loginPanel.setVisible(true);
         pane.add(loginPanel);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == backButton) {
+                    loginPanel.setVisible(false);
+                    setWelcomePageVisible();
+                }
+            }
+        });
     }
-
     public void setCreateAccountPageVisible() {
         createAccountPanel = new JPanel();
         enterEmailTextField = new JTextField(5);
@@ -107,20 +136,36 @@ public class GUI extends JComponent implements Runnable  {
         createAccountButton.addActionListener(actionListener);
         enterEmail = new JLabel("Enter An Email");
         enterPassword = new JLabel("Enter a Password");
-        userTypePrompt = new JLabel("1: Seller\n2: Customer");
-        userType = new JTextField(5);
+        userTypes = new JLabel("Select User Type");
+        String[] strings = {"Seller", "Customer"};
+        sellerOrCustomer = new JComboBox<>(strings);
         createHappyFeetAccount = new JLabel("Create New Happy Feet Account");
         createHappyFeetAccount.setFont(new Font("Serif", Font.PLAIN, 20));
+        backButton = new JButton("Back");
         createAccountPanel.add(enterEmail);
         createAccountPanel.add(enterEmailTextField);
         createAccountPanel.add(enterPassword);
         createAccountPanel.add(enterPasswordTextField);
-        createAccountPanel.add(userTypePrompt);
-        createAccountPanel.add(userType);
+        createAccountPanel.add(userTypes);
+        createAccountPanel.add(sellerOrCustomer);
         createAccountPanel.add(createAccountButton);
+        createAccountPanel.add(backButton);
         createAccountPanel.setVisible(true);
         pane.add(createAccountPanel);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createAccountPanel.setVisible(false);
+                setWelcomePageVisible();
+            }
+        });
     }
+
+    public void setSellerPageVisible() {
+
+    }
+
+
 
     public void run() {
         frame = new JFrame("Happy Feet");
