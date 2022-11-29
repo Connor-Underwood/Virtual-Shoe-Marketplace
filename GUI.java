@@ -41,8 +41,21 @@ public class GUI extends JComponent implements Runnable  {
     JLabel enterEmail;
     JLabel enterPassword;
     JLabel userTypes;
+
     JComboBox<String> sellerOrCustomer;
     //
+
+    // Seller Panel Layout
+    JPanel sellerPanel;
+    JComboBox<String> sellerOptions;
+    JLabel sellerOptionsLabel;
+    // End of Seller Panel Layout
+
+    // Customer Panel Layout
+    JPanel customerPanel;
+    JComboBox<String> customerOptions;
+    JLabel customerOptionsLabel;
+    // End of Customer Panel Layout
 
     boolean login = false;
     boolean createAccount = false;
@@ -52,18 +65,28 @@ public class GUI extends JComponent implements Runnable  {
         @Override
         public void actionPerformed(ActionEvent e) {
            if (e.getSource() == welcomeLoginButton) {
-              welcomePageNonVisible();
+              welcomePanel.setVisible(false);
               setLoginPageVisible();
            }
            if (e.getSource() == welcomeCreateAccountButton) {
-               welcomePageNonVisible();
+               welcomePanel.setVisible(false);
                setCreateAccountPageVisible();
            }
-//           if (e.getSource() == loginButton) {
-//               login = true;
-//           }
+           if (e.getSource() == loginButton) {
+               login = true; // set this to true, set it to false if they hit back button
+               // send to server, validate text fields, then continue, BUT SHOULD SERVER TO GUI OR CLIENT
+               loginPanel.setVisible(false);
+               setSellerPageVisible();
+           }
            if (e.getSource() == createAccountButton) {
-               createAccount = true;
+               createAccount = true; // set this to true, set it to false if they hit back button
+               if (sellerOrCustomer.getSelectedIndex() == 0) {
+                   createAccountPanel.setVisible(false);
+                   setSellerPageVisible();
+               } else {
+                   createAccountPanel.setVisible(false);
+                   setCustomerPageVisible();
+               }
            }
 
         }
@@ -72,9 +95,7 @@ public class GUI extends JComponent implements Runnable  {
         this.frame.dispose();
     }
 
-    public void welcomePageNonVisible() {
-        welcomePanel.setVisible(false);
-    }
+
     public void setWelcomePageVisible() {
         // Welcome-Page GUI
         welcomePanel = new JPanel();
@@ -102,12 +123,7 @@ public class GUI extends JComponent implements Runnable  {
         passwordLabel = new JLabel("Password:");
         passwordLabel.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         loginButton = new JButton("Login");
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                login = true;
-            }
-        });
+        loginButton.addActionListener(actionListener);
         backButton = new JButton("Back");
         loginPanel = new JPanel();
         loginPanel.add(userLabel);
@@ -124,6 +140,7 @@ public class GUI extends JComponent implements Runnable  {
                 if (e.getSource() == backButton) {
                     loginPanel.setVisible(false);
                     setWelcomePageVisible();
+                    login = false;
                 }
             }
         });
@@ -157,14 +174,60 @@ public class GUI extends JComponent implements Runnable  {
             public void actionPerformed(ActionEvent e) {
                 createAccountPanel.setVisible(false);
                 setWelcomePageVisible();
+                createAccount = false;
             }
         });
     }
 
     public void setSellerPageVisible() {
-
+        sellerPanel = new JPanel();
+        String[] arr = {"Add a Store", "Add a Shoe", "Remove a Shoe", "Edit a Shoe", "View your Sales Information",
+        "Change E-Mail", "Change Password", "Import Products from a CSV File", "Export Products to a File"};
+        sellerOptions = new JComboBox<>(arr);
+        sellerOptionsLabel = new JLabel("Seller Options");
+        backButton = new JButton("Back");
+        sellerPanel.add(sellerOptionsLabel);
+        sellerPanel.add(sellerOptions);
+        sellerPanel.add(backButton);
+        sellerPanel.setVisible(true);
+        pane.add(sellerPanel);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sellerPanel.setVisible(false);
+                if (login) {
+                    setLoginPageVisible();
+                } else {
+                    setCreateAccountPageVisible();
+                }
+            }
+        });
     }
 
+    public void setCustomerPageVisible() {
+        customerPanel = new JPanel();
+        String[] arr = {"View Entire Market", "Search Market", "Purchase a Shoe", "Review Purchase History", "Export Purchase as a File",
+        "Change E-Mail", "Change Password", "View Market Statistics"};
+        customerOptions = new JComboBox<>(arr);
+        customerOptionsLabel = new JLabel("Customer Options");
+        backButton = new JButton("Back");
+        customerPanel.add(customerOptionsLabel);
+        customerPanel.add(customerOptions);
+        customerPanel.add(backButton);
+        customerPanel.setVisible(true);
+        pane.add(customerPanel);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                customerPanel.setVisible(false);
+                if (login) {
+                    setLoginPageVisible();
+                } else {
+                    setCreateAccountPageVisible();
+                }
+            }
+        });
+    }
 
 
     public void run() {
@@ -193,6 +256,7 @@ public class GUI extends JComponent implements Runnable  {
         welcomePanel.setVisible(true);
         pane.add(welcomePanel);
         // End of Welcome-Page GUI
+
 
     }
 
