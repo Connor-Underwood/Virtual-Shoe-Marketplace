@@ -1,69 +1,74 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 // Server class
 class Server {
-    public static void main(String[] args)
-    {
-        ServerSocket server = null;
+    private ServerSocket serverSocket;
 
+    public Server(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+    public void startServer() {
         try {
+            while (!serverSocket.isClosed()) {
+                Socket clientSocket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
 
-            // server is listening on port 1234
-            server = new ServerSocket(1234);
-            server.setReuseAddress(true);
-
-            // running infinite loop for getting
-            // client request
-            while (true) {
-
-                // socket object to receive incoming client
-                // requests
-                Socket client = server.accept();
-
-                // Displaying that new client is connected
-                // to server
-                System.out.println("New client connected"
-                        + client.getInetAddress()
-                        .getHostAddress());
-
-                // create a new thread object
-                ClientHandler clientSock
-                        = new ClientHandler(client);
-
-                // This thread will handle the client
-                // separately
-                new Thread(clientSock).start();
+                Thread t = new Thread(clientHandler);
+                t.start();
             }
+        } catch (IOException io) {
+            closeServer();
         }
-        catch (IOException e) {
-            e.printStackTrace();
+    }
+    public void closeServer() {
+        try {
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+        } catch (IOException io) {
+            JOptionPane.showMessageDialog(null, "Error closing server.");
         }
-        finally {
-            if (server != null) {
-                try {
-                    server.close();
+    }
+
+
+    // ClientHandler class
+    private static class ClientHandler implements Runnable {
+        public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+        private Socket clientSocket;
+        private BufferedReader reader;
+        private PrintWriter writer;
+
+        // Constructor
+        public ClientHandler(Socket socket) throws IOException {
+            this.clientSocket = socket;
+            this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
+            clientHandlers.add(this);
+        }
+
+        public void run() {
+            try {
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
                 }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+            } catch (IOException io) {
+                JOptionPane.showMessageDialog(null, "Error running ClientHandler.");
             }
         }
     }
 
-    // ClientHandler class
-    private static class ClientHandler implements Runnable {
-        private final Socket clientSocket;
 
-        // Constructor
-        public ClientHandler(Socket socket)
-        {
-            this.clientSocket = socket;
-        }
-
-        public void run()
-        {
-            new Thread(new WelcomeToHappyFeet()).start();
+    public static void main(String[] args) {
+        try {
+            ServerSocket serverSocket = new ServerSocket(1234);
+            Server server = new Server(serverSocket);
+            server.startServer();
+        } catch (IOException io) {
+            JOptionPane.showMessageDialog(null, "Error starting server");
         }
     }
 }
