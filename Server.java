@@ -150,52 +150,53 @@ class Server {
                 if (typeOfUser == 1) {
                     int index;
                     Seller seller;
-                    synchronized (GATEKEEPER) {
+                    synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE ACCESSING SHARED DATA
                         index = -1;
                         for (Seller s : MarketPlace.sellers) {
                             if (s.getPin().equals(Integer.toString(userPin))) {
                                 index = MarketPlace.sellers.indexOf(s);
                             }
                         }
-                        seller = MarketPlace.sellers.get(index);
+                        seller = MarketPlace.sellers.get(index); // GETS SPECIFIC SELLER
                     }
 
-                    String sellerSelectedOption = reader.readLine();
+                    String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
 
                     if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
-                        String storeName = reader.readLine();
+                        String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
                         Store tempStore;
-                        synchronized (GATEKEEPER) {
-                            tempStore = new Store(storeName, seller);
-                            if (seller.addStore(tempStore, true)) {
+                        synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                            tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
+                            if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
                                 writer.println("Store added");
                             } else {
                                 writer.println("Store already exists");
                             }
-                            MarketPlace.sellers.set(index, seller);
+                            MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
                         }
                     }
 
                     if (sellerSelectedOption.equalsIgnoreCase("Add a shoe")) {
-                        String storeName = reader.readLine();
+                        String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
                         int storeIndex = -1;
-                        synchronized (GATEKEEPER) {
+                        synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
                             for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
                                 if (seller.getStores().get(i).getName().equals(storeName)) {
                                     storeIndex = i;
                                 }
                             }
                             writer.println(storeIndex);
-                            writer.flush();
+                            // writer.flush();
                         }
-                        Store store = seller.getStores().get(storeIndex);
+                        Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
+                        // GETS ALL SHOE DETAILS FROM CLIENT
                         String shoeName = reader.readLine();
                         String shoeDesc =  reader.readLine();
                         double price = Double.parseDouble(reader.readLine());
                         int quantity = Integer.parseInt(reader.readLine());
-                        synchronized (GATEKEEPER) {
-                            Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity);
-                            if (seller.addShoe(store, shoe, true)) {
+                        synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                            Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
+                            if (seller.addShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
                                 MarketPlace.sellers.set(index, seller);
                                 writer.println("Shoe added");
                             } else {
