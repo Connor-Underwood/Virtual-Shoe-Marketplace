@@ -1,11 +1,9 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.*;
-import java.util.*;
+
+
+import static javax.swing.JOptionPane.YES_OPTION;
 
 // Client class
 public class Client {
@@ -24,16 +22,16 @@ public class Client {
             // reading from server
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            String[] welcomePage = {"1: Login", "2: Create An Account"}; // Welcomes the Client presents drop down menu
+            String[] welcomePage = {"Login", "Create An Account"}; // Welcomes the Client presents drop down menu
             // to login or create account
             String sellerOrCustomer = (String) JOptionPane.showInputDialog(null, "Welcome To Happy Feet!",
                     "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, welcomePage, null);
 
 
-            String email = ""; // email of client we use for later
-            String password = ""; // password of client we use for later
+            String email; // email of client we use for later
+            String password; // password of client we use for later
             String userType = ""; // userType, Customer or Seller
-            if (sellerOrCustomer.equals("1: Login")) {
+            if (sellerOrCustomer.equals("Login")) {
                 writer.println("Login"); // Let Server know Client is trying to log in
                 email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                 if (email == null) { // If click exit, email will be null, which means we exit program
@@ -84,8 +82,7 @@ public class Client {
 
                 // Receive if the Client is a Customer or Seller fromm the Server Database
                 userType = reader.readLine();
-            }
-            else {
+            } else if (sellerOrCustomer.equalsIgnoreCase("Create An Account")) {
                 writer.println("Create"); // Let Server know Client is trying to Create An Account
                 email = JOptionPane.showInputDialog(null, "Please Enter Your E-Mail.");
                 if (email == null) { // If they click exit, close program
@@ -159,12 +156,76 @@ public class Client {
                 writer.println(userType);
             }
 
-
-
-
-
-
             if (userType.equals("Seller")) { // Seller Implementation
+                String storeName;
+                String shoeName;
+                JOptionPane.showMessageDialog(null, "Welcome Seller!", "Happy Feet",
+                        JOptionPane.PLAIN_MESSAGE);
+
+                int performAnotherActivity;
+                String[] sellerMenuOptions = {"Add a Store", "Add a new Shoe", "Remove a Shoe", "Edit a Shoe",
+                "View your sales information", "Change Email", "Change Password", "Import products from a file",
+                "Export products to a file"};
+
+                do {
+                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
+                            "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, sellerMenuOptions, 0);
+
+                    writer.println(chosenOption);
+
+                    // ADD STORE
+                    if (chosenOption.equalsIgnoreCase("Add a store")) {
+                        storeName = JOptionPane.showInputDialog(null, "What is the name of" +
+                                "the store you would like to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName);
+                        String addStoreResult = reader.readLine();
+                        if (addStoreResult.equalsIgnoreCase("Store added")) {
+                            JOptionPane.showMessageDialog(null, "Store added successfully!",
+                                    "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                        } else if (addStoreResult.equalsIgnoreCase("Store already exists")) {
+                            JOptionPane.showMessageDialog(null, "You already own the store!",
+                                    null, JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+
+                    // ADD SHOE
+                    if (chosenOption.equalsIgnoreCase("Add a New Shoe")) {
+                        storeName = JOptionPane.showInputDialog(null, "Which store would you like to add" +
+                                " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName); // WE HAVE A PROBLEM HERE
+                        String storeIndex = reader.readLine();
+                        if (storeIndex.equals("-1")) {
+                            JOptionPane.showMessageDialog(null, "You do not own this store!",
+                                    "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            shoeName = JOptionPane.showInputDialog(null, "What is the name of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeName);
+                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the description of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeDesc);
+                            double price = Double.parseDouble(JOptionPane.showInputDialog(null, "What is the price of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
+                            writer.println(price);
+                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
+                            writer.println(quantity);
+                            String addShoeResult = reader.readLine();
+                            if (addShoeResult.equalsIgnoreCase("Shoe added")) {
+                                JOptionPane.showMessageDialog(null, "Shoe added successfully!",
+                                        "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                            } else if (addShoeResult.equalsIgnoreCase("Shoe could not be added")){
+                                JOptionPane.showMessageDialog(null, "Shoe could not be added :(",
+                                        "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+
+
+                    performAnotherActivity = JOptionPane.showConfirmDialog(null,
+                            "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION );
+                } while (performAnotherActivity == YES_OPTION);
+
 
             } else { // Customer Implementation
 
@@ -183,8 +244,8 @@ public class Client {
             e.printStackTrace();
         }
     }
-        // establish a connection by providing host and port
-        // number
+    // establish a connection by providing host and port
+    // number
 
 
 
