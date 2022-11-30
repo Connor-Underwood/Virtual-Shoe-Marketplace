@@ -72,7 +72,7 @@ public class Client {
                         return;
                     }
                     // Get new Password
-                    password = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                    password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                     if (password == null) { // If they exit, close program
                         return;
                     }
@@ -167,18 +167,20 @@ public class Client {
                 "View your sales information", "Change Email", "Change Password", "Import products from a file",
                 "Export products to a file"};
 
+                // PRESENTS SELLER MENU
                 do {
                     String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
                             "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, sellerMenuOptions, 0);
 
+                    // SENDS THE CHOSEN OPTION TO THE SERVER
                     writer.println(chosenOption);
 
                     // ADD STORE
                     if (chosenOption.equalsIgnoreCase("Add a store")) {
                         storeName = JOptionPane.showInputDialog(null, "What is the name of" +
                                 "the store you would like to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
-                        writer.println(storeName);
-                        String addStoreResult = reader.readLine();
+                        writer.println(storeName); // SENDS STORENAME TO THE SERVER
+                        String addStoreResult = reader.readLine(); // USED TO CHECK IF STORE IS ADDED 
                         if (addStoreResult.equalsIgnoreCase("Store added")) {
                             JOptionPane.showMessageDialog(null, "Store added successfully!",
                                     "Happy Feet", JOptionPane.PLAIN_MESSAGE);
@@ -192,9 +194,9 @@ public class Client {
                     if (chosenOption.equalsIgnoreCase("Add a New Shoe")) {
                         storeName = JOptionPane.showInputDialog(null, "Which store would you like to add" +
                                 " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
-                        writer.println(storeName); // WE HAVE A PROBLEM HERE
-                        String storeIndex = reader.readLine();
-                        if (storeIndex.equals("-1")) {
+                        writer.println(storeName); // WE HAVE A PROBLEM HERE (SENDS STORENAME TO THE SERVER)
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        if (storeIndex.equals("-1")) { 
                             JOptionPane.showMessageDialog(null, "You do not own this store!",
                                     "Happy Feet", JOptionPane.ERROR_MESSAGE);
                         } else {
@@ -210,7 +212,7 @@ public class Client {
                             int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the" +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
                             writer.println(quantity);
-                            String addShoeResult = reader.readLine();
+                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS ADDED TO THE STORE
                             if (addShoeResult.equalsIgnoreCase("Shoe added")) {
                                 JOptionPane.showMessageDialog(null, "Shoe added successfully!",
                                         "Happy Feet", JOptionPane.PLAIN_MESSAGE);
@@ -224,7 +226,7 @@ public class Client {
 
                     performAnotherActivity = JOptionPane.showConfirmDialog(null,
                             "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION );
-                } while (performAnotherActivity == YES_OPTION);
+                } while (performAnotherActivity == YES_OPTION);  //LOOPS OVER SELLER MENU AGAIN IF CLIENT SELECTS YES
 
 
             } else { // Customer Implementation
