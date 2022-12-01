@@ -391,7 +391,38 @@ public class Client {
 
 
             } else { // Customer Implementation
+                String storeName;
+                String shoeName;
+                JOptionPane.showMessageDialog(null, "Welcome Customer!", "Happy Feet",
+                        JOptionPane.PLAIN_MESSAGE);
 
+                int performAnotherActivity;
+                String[] customerMenuOptions = {MarketPlace.VIEW_MARKET, MarketPlace.SEARCH_MARKET, MarketPlace.REVIEW_PURCHASE_HISTORY, MarketPlace.EXPORT_SHOE, MarketPlace.CHANGE_CUSTOMER_EMAIL, MarketPlace.CHANGE_CUSTOMER_PASSWORD, MarketPlace.PURCHASE_SHOE, MarketPlace.VIEW_MARKET_STATISTICS};
+
+                // PRESENTS SELLER MENU
+
+                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
+                            "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, customerMenuOptions, 0);
+
+                    // SENDS THE CHOSEN OPTION TO THE SERVER
+                    writer.println(chosenOption);
+                    if(chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)){
+                        //TODO
+                    } else if(chosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
+                        //TODO
+                    } else if (chosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)){
+                        //TODO
+                    } else if(chosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
+                        //TODO
+                    } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+                        //TODO
+                    } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
+                        //TODO
+                    } else if (chosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
+                        //TODO
+                    } else if (chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
+                        //TODO
+                    }
             }
 
 
