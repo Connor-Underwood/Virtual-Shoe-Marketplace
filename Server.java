@@ -1,319 +1,416 @@
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Random;
 
-// Server class
-class Server {
-    private ServerSocket serverSocket;
+import static javax.swing.JOptionPane.*;
 
-    public Server(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-    }
+// Client class
+public class Client {
+    private PrintWriter writer;
+    private BufferedReader reader;
 
-    public void startServer() {
-        try {
-            while (!serverSocket.isClosed()) {
-                Socket clientSocket = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(clientSocket);
+    // find some way to differentiate clients in server
 
-                Thread t = new Thread(clientHandler);
-                t.start();
-            }
-        } catch (IOException io) {
-            closeServer();
-        }
-    }
-
-    public void closeServer() {
-        try {
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-        } catch (IOException io) {
-            JOptionPane.showMessageDialog(null, "Error closing server.");
-        }
-    }
-
-
-    // ClientHandler class
-    private static class ClientHandler implements Runnable {
-        public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-
-        public static final Object GATEKEEPER = new Object();
-
-        private Socket clientSocket;
-        private BufferedReader reader;
-        private PrintWriter writer;
-
-        // Constructor
-        public ClientHandler(Socket socket) throws IOException {
-            this.clientSocket = socket;
-            this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
-            clientHandlers.add(this);
-        }
-
-        public void run() {
-            int typeOfUser = -1;
-            int userPin = -1;
-            MarketPlace.loadMarket(); // loads Market for all clients
-            try {
-                // Login/Create Account Implementation ----------
-                String start = reader.readLine(); // Login or Create Account
-                if (start.equals("Login")) { // Client is trying to log in
-                    String email = reader.readLine(); // Get E-Mail Input
-                    while (MarketPlace.checkEmail(email)) { // Run a loop if email is doesn't exist within accounts.csv
-                        writer.println("Invalid E-Mail");
-                        email = reader.readLine();
-                    }
-                    writer.println(email); // send email back to client
-                    String password = reader.readLine(); // Get Password Input
-                    while (!MarketPlace.checkPassword(email, password)) { // Run a loop to make sure password matches e-mail
-                        writer.println("Invalid Password");
-                        password = reader.readLine();
-                    }
-                    writer.println(password); // send password back to client
-
-                    if (MarketPlace.checkPinFromCredentials(email, password).length() == 4) {
-                        userPin = Integer.parseInt(MarketPlace.checkPinFromCredentials(email, password));
-                        typeOfUser = 1;
-                        writer.println("Seller");
-                    } else if (MarketPlace.checkPinFromCredentials(email, password).length() == 5) {
-                        userPin = Integer.parseInt(MarketPlace.checkPinFromCredentials(email, password));
-                        typeOfUser = 2;
-                        writer.println("Customer");
-                    }
-                } else if (start.equals("Create")) { // Client is trying to Create An Account
-                    Random random = new Random(); // Used to create the pin value for the client
-                    MarketPlace.createAccountsFile(); // if accounts.csv doesn't exist, we create it here
-                    String email = reader.readLine(); // receive E-Mail from Client
-                    while (!MarketPlace.checkEmail(email)) { // Verify it hasn't been taken inside a loop
-                        writer.println("Taken");
-                        email = reader.readLine();
-                    }
-                    writer.println(email); // Send valid E-Mail back to Client
-
-                    String password = reader.readLine(); // Does not have to verify, this is a new Password
-                    String userType = reader.readLine(); // Receive the typeOfUser of the created account, Seller/Customer
-
-
-                    if (userType.equals("Seller")) { // We create the Pin for that Seller
-                        typeOfUser = 1;
-                        userPin = random.nextInt(1000, 9999);
-                        while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            userPin = random.nextInt(1000, 9999);
-                        }
-                    } else {
-                        typeOfUser = 2;
-                        userPin = random.nextInt(10000, 99999); // We create the Pin for that Customer
-                        while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            userPin = random.nextInt(10000, 99999);
-                        }
-                    }
-                    synchronized (GATEKEEPER) { // THIS MUST BE SYNCHRONIZED BECAUSE WE ARE ACCESSING SHARED INFORMATION
-                        // FOR ALL CLIENTS. A.K.A., ALL CLIENTS ARE READING FROM THIS FILE, MAKE SURE ONLY ONE CLIENT WRITES
-                        // TO IT AT A TIME
-                        try (PrintWriter writer = new PrintWriter(new FileWriter("accounts.csv", true))) {
-                            writer.println(userPin + "," + email + "," + password + ",");
-                            writer.flush();
-                        } catch (IOException io) {
-                            System.out.println("Error writing to the accounts.csv file.");
-                        }
-                    }
-
-                    if (userType.equals("Seller")) {
-                        synchronized (GATEKEEPER) { // THIS MUST BE SYNCHRONIZED BECAUSE WE ARE ACCESSING SHARED INFORMATION
-                            // FOR ALL CLIENTS. A.K.A., ALL CLIENTS ARE READING FROM THIS FILE, MAKE SURE ONLY ONE CLIENT WRITES
-                            // TO IT AT A TIME
-                            try (PrintWriter writer = new PrintWriter(new FileWriter("market.csv", true))) {
-                                writer.println(userPin + "," + email + "," + password + ",");
-                                writer.flush();
-                            } catch (IOException io) {
-                                System.out.println("Error writing to the market.csv file.");
-                            }
-                            Seller seller = new Seller(Integer.toString(userPin), email, password); // make a new Seller object
-                            MarketPlace.sellers.add(seller); // add it to the arrayList of Sellers because they just made an account
-                        }
-                    } else {
-                        synchronized (GATEKEEPER) { // THIS MUST BE SYNCHRONIZED BECAUSE WE ARE ACCESSING SHARED INFORMATION
-                            // FOR ALL CLIENTS. A.K.A., ALL CLIENTS OBTAIN INFO FROM THE STATIC ARRAYLIST OF CUSTOMERS
-                            // IN MARKETPLACE, IF WE MODIFY IT LIKE WE ARE DOING HERE, IT MUST BE SYNCHRONIZED
-                            Customer customer = new Customer(Integer.toString(userPin), email, password);
-                            MarketPlace.customers.add(customer);
-                        }
-                    }
-                    // End of Login/Create Account Implementation ----------
-                }
-
-                // START OF SELLER IMPLEMENTATION;
-                if (typeOfUser == 1) {
-                    int index;
-                    Seller seller;
-                    synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE ACCESSING SHARED DATA
-                        index = -1;
-                        for (Seller s : MarketPlace.sellers) {
-                            if (s.getPin().equals(Integer.toString(userPin))) {
-                                index = MarketPlace.sellers.indexOf(s);
-                            }
-                        }
-                        seller = MarketPlace.sellers.get(index); // GETS SPECIFIC SELLER
-                    }
-                    String performAnotherActivity = "";
-                    do {
-                        String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
-
-                        if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
-                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
-                            Store tempStore;
-                            synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                                tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
-                                if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
-                                    writer.println("Store added");
-                                } else {
-                                    writer.println("You already own this store!");
-                                }
-                                MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
-                            }
-                        }
-                        if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
-                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
-                            int storeIndex = -1;
-                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
-                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
-                                    if (seller.getStores().get(i).getName().equals(storeName)) {
-                                        storeIndex = i;
-                                    }
-                                }
-                                writer.println(storeIndex);
-                                // writer.flush();
-                            }
-                            if (storeIndex != -1) {
-                                Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
-                                // GETS ALL SHOE DETAILS FROM CLIENT
-                                String shoeName = reader.readLine();
-                                String shoeDesc = reader.readLine();
-                                double price = Double.parseDouble(reader.readLine());
-                                int quantity = Integer.parseInt(reader.readLine());
-                                synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                                    Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
-                                    if (seller.addShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
-                                        MarketPlace.sellers.set(index, seller);
-                                        writer.println("Shoe added");
-                                    } else {
-                                        writer.println("Shoe could not be added");
-                                    }
-                                }
-                            }
-                        }
-                        if (sellerSelectedOption.equalsIgnoreCase("Remove a shoe")) {
-                            String shoeName = reader.readLine();
-                            String storeName = reader.readLine();
-                            int storeIndex = -1;
-                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
-                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
-                                    if (seller.getStores().get(i).getName().equals(storeName)) {
-                                        storeIndex = i;
-                                    }
-                                }
-                                writer.println(storeIndex);
-                            }
-                            if (storeIndex != -1) {
-                                Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
-                                // GETS ALL SHOE DETAILS FROM CLIENT
-                                String shoeDesc = reader.readLine();
-                                double price = Double.parseDouble(reader.readLine());
-                                int quantity = Integer.parseInt(reader.readLine());
-                                synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                                    Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
-                                    if (seller.removeShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
-                                        MarketPlace.sellers.set(index, seller);
-                                        writer.println("Shoe removed!");
-                                    } else {
-                                        writer.println(storeName + " does not own " + shoeName  + "'s!");
-                                    }
-                                }
-                            }
-
-                        }
-                        if (sellerSelectedOption.equalsIgnoreCase("Edit a Shoe")) {
-                            String shoeName = reader.readLine();
-                            String storeName = reader.readLine();
-                            int storeIndex = -1;
-                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
-                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
-                                    if (seller.getStores().get(i).getName().equals(storeName)) {
-                                        storeIndex = i;
-                                    }
-                                }
-                                writer.println(storeIndex);
-                            }
-                            if (storeIndex != -1) {
-                                Store store = seller.getStores().get(storeIndex);
-                                int shoeIndex = -1;
-                                synchronized (GATEKEEPER) {
-                                    for (int i = 0; i < store.getShoes().size(); i++) {
-                                        if (store.getShoes().get(i).getName().equalsIgnoreCase(shoeName)) {
-                                            shoeIndex = i;
-                                        }
-                                    }
-                                    writer.println(shoeIndex);
-                                }
-                                if (shoeIndex != -1) {
-                                    Shoe shoe = store.getShoes().get(shoeIndex);
-                                    seller.removeShoe(store, shoe, true);
-                                    String newShoeName = shoe.getName();
-                                    String newShoeDescription = shoe.getDescription();
-                                    String newPrice = String.valueOf(shoe.getPrice());
-                                    String newQuantity = Integer.toString(shoe.getQuantity());
-                                    String changeShoeName = reader.readLine();
-                                    if (changeShoeName.equals("Change Shoe Name")) {
-                                        newShoeName = reader.readLine();
-                                    }
-                                    String changeShoeDesc = reader.readLine();
-                                    if (changeShoeDesc.equals("Change Shoe Description")) {
-                                        newShoeDescription = reader.readLine();
-                                    }
-                                    String changeShoePrice = reader.readLine();
-                                    if (changeShoePrice.equals("Change Shoe Price")) {
-                                        newPrice = reader.readLine();
-                                    }
-                                    String changeShoeQuantity = reader.readLine();
-                                    if (changeShoeQuantity.equals("Change Shoe Quantity")) {
-                                        newQuantity = reader.readLine();
-                                    }
-                                    synchronized (GATEKEEPER) {
-                                        seller.addShoe(store, new Shoe(store, newShoeName, newShoeDescription, Double.parseDouble(newPrice),
-                                                Integer.parseInt(newQuantity)), true);
-                                        MarketPlace.sellers.set(index, seller);
-                                    }
-                                    writer.println("Y");
-                                }
-                            }
-                        }
-                        if (sellerSelectedOption.equalsIgnoreCase("View Sales")) {
-
-                        }
-                        performAnotherActivity = reader.readLine();
-                    } while (performAnotherActivity.equals("0"));
-                }
-
-
-            } catch (IOException io) {
-                JOptionPane.showMessageDialog(null, "Error running ClientHandler.");
-            }
-        }
-    }
-
-
+    //public static void main(String[] args) {
     public static void main(String[] args) {
-        try {
-            ServerSocket serverSocket = new ServerSocket(1234);
-            Server server = new Server(serverSocket);
-            server.startServer();
-        } catch (IOException io) {
-            JOptionPane.showMessageDialog(null, "Error starting server");
+        try (Socket socket = new Socket("localhost", 1234)) {
+
+            // writing to server
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
+            // reading from server
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            String[] welcomePage = {"Login", "Create An Account"}; // Welcomes the Client presents drop down menu
+            // to login or create account
+            String sellerOrCustomer = (String) JOptionPane.showInputDialog(null, "Welcome To Happy Feet!",
+                    "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, welcomePage, null);
+
+
+            String email; // email of client we use for later
+            String password; // password of client we use for later
+            String userType = ""; // userType, Customer or Seller
+            if (sellerOrCustomer.equals("Login")) {
+                writer.println("Login"); // Let Server know Client is trying to log in
+                email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                if (email == null) { // If click exit, email will be null, which means we exit program
+                    return;
+                }
+                writer.println(email); // send E-Mail to Server and wait for it to be verified
+                while (reader.readLine().equals("Invalid E-Mail")) { // If Invalid E-Mail, run loop to get a Valid One
+                    int num = JOptionPane.showConfirmDialog(null,
+                            "Invalid E-Mail",
+                            "Happy Feet",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+                    if (num == JOptionPane.CANCEL_OPTION) { // If they click exit, exit the program
+                        return;
+                    }
+
+                    // Get new E-Mail
+                    email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                    if (email == null) {
+                        return;
+                    }
+                    writer.println(email);
+                }
+                // At this point, the user has entered a valid E-Mail
+                // Now we start the password verification below
+                password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                if (password == null) { // Check if exit button, then exit the program
+                    return;
+                }
+                writer.println(password); // Send password to Server and wait for verification
+                while (reader.readLine().equals("Invalid Password")) {
+                    int num = JOptionPane.showConfirmDialog(null,
+                            "Invalid Password",
+                            "Happy Feet",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+                    if (num == JOptionPane.CLOSED_OPTION) { // If they exit, close program
+                        return;
+                    }
+                    // Get new Password
+                    password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                    if (password == null) { // If they exit, close program
+                        return;
+                    }
+                    writer.println(password);
+                }
+                // At this point, we have valid credentials
+
+                // Receive if the Client is a Customer or Seller fromm the Server Database
+                userType = reader.readLine();
+            } else if (sellerOrCustomer.equalsIgnoreCase("Create An Account")) {
+                writer.println("Create"); // Let Server know Client is trying to Create An Account
+                email = JOptionPane.showInputDialog(null, "Please Enter Your E-Mail.");
+                if (email == null) { // If they click exit, close program
+                    return;
+                }
+                while (!email.contains("@")) { // A loop to make sure the E-Mail contains an @ character
+                    int num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy Feet",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    if (num == JOptionPane.CLOSED_OPTION) {
+                        return;
+                    }
+                    email = JOptionPane.showInputDialog(null, "Please Enter Your E-Mail");
+                    if (email == null) {
+                        return;
+                    }
+                }
+                writer.println(email); // Send to Server for taken E-Mail verification
+                while (reader.readLine().equals("Taken")) { // If taken, run a loop until the E-Mail is valid and unique
+                    int num = JOptionPane.showConfirmDialog(null, "This E-Mail is Already Taken", "Happy Feet", JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+                    if (num == JOptionPane.CLOSED_OPTION) { // If Client exits, close program
+                        return;
+                    }
+                    email = JOptionPane.showInputDialog(null, "Please Enter Your E-Mail");
+                    // Receive new E-Mail
+                    if (email == null) { // If they exit, close program
+                        return;
+                    }
+                    while (!email.contains("@")) { // Have to check again for the @ character, run a loop
+                        num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy Feet",
+                                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                        if (num == JOptionPane.CLOSED_OPTION) {
+                            return;
+                        }
+                        email = JOptionPane.showInputDialog(null, "Please Enter Your E-Mail");
+                        if (email == null) {
+                            return;
+                        }
+                    }
+                    writer.println(email); // At this point, the E-Mail is valid, so we send to Server to our
+                    // account can be added to the Server Database
+                }
+
+                // Receive Password from Client Input
+                password = JOptionPane.showInputDialog(null, "Please Enter A Password Greater Than 5 Characters");
+                if (password == null) { // If they exit, close program
+                    return;
+                }
+                while (password.length() < 5) { // Make sure password is greater than 5 characters inside a loop
+                    int num = JOptionPane.showConfirmDialog(null, "Password Must Be Greater Than 5 Characters", "Happy Feet",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    if (num == JOptionPane.CLOSED_OPTION) { // If they exit, close program
+                        return;
+                    }
+                    password = JOptionPane.showInputDialog(null, "Please Enter A Password Greater Than 5 Characters");
+                    if (password == null) { // If they exit close program
+                        return;
+                    }
+                }
+                // Server does not have to verify a new password, so we just send straight to server
+                writer.println(password);
+
+                String[] userTypes = {"Seller", "Customer"} ;
+                // Ask if Client is a Customer or Seller
+                userType = (String) JOptionPane.showInputDialog(null, "Choose",
+                        "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, userTypes, 0);
+                if (userType == null) {
+                    return;
+                }
+                // Send this userType information to the Server to it can be added to the Database
+                writer.println(userType);
+            }
+
+            if (userType.equals("Seller")) { // Seller Implementation
+                String storeName;
+                String shoeName;
+                JOptionPane.showMessageDialog(null, "Welcome Seller!", "Happy Feet",
+                        JOptionPane.PLAIN_MESSAGE);
+
+                int performAnotherActivity;
+                String[] sellerMenuOptions = {"Add a Store", "Add a New Shoe", "Remove a Shoe", "Edit a Shoe",
+                        "View your sales information", "Change Email", "Change Password", "Import products from a file",
+                        "Export products to a file"};
+
+                // PRESENTS SELLER MENU
+                do {
+                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
+                            "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, sellerMenuOptions, 0);
+
+                    // SENDS THE CHOSEN OPTION TO THE SERVER
+                    writer.println(chosenOption);
+
+                    // ADD STORE
+                    if (chosenOption.equalsIgnoreCase("Add a store")) {
+                        storeName = JOptionPane.showInputDialog(null, "What is the name of" +
+                                "the store you would like to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName); // SENDS STORENAME TO THE SERVER
+                        String addStoreResult = reader.readLine(); // USED TO CHECK IF STORE IS ADDED
+                        if (addStoreResult.equalsIgnoreCase("Store added")) {
+                            JOptionPane.showMessageDialog(null, "Store added successfully!",
+                                    "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                        } else if (addStoreResult.equalsIgnoreCase("You already own this store!")) {
+                            JOptionPane.showMessageDialog(null, "You already own the store!",
+                                    null, JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+
+                    // ADD SHOE
+                    if (chosenOption.equalsIgnoreCase("Add a New Shoe")) {
+                        storeName = JOptionPane.showInputDialog(null, "Which store would you like to add" +
+                                " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName); // WE HAVE A PROBLEM HERE (SENDS STORENAME TO THE SERVER)
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        if (storeIndex.equals("-1")) {
+                            JOptionPane.showMessageDialog(null, "You do not own this store!",
+                                    "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            shoeName = JOptionPane.showInputDialog(null, "What is the name of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeName);
+                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the description of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeDesc);
+                            double price = Double.parseDouble(JOptionPane.showInputDialog(null, "What is the price of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
+                            writer.println(price);
+                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the" +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
+                            writer.println(quantity);
+                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS ADDED TO THE STORE
+                            if (addShoeResult.equalsIgnoreCase("Shoe added")) {
+                                JOptionPane.showMessageDialog(null, "Shoe added successfully!",
+                                        "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                            } else if (addShoeResult.equalsIgnoreCase("Shoe could not be added")){
+                                JOptionPane.showMessageDialog(null, "Shoe could not be added :(",
+                                        "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+
+                    // REMOVE SHOE
+                    if (chosenOption.equalsIgnoreCase("Remove a Shoe")) {
+                        shoeName = JOptionPane.showInputDialog(null,
+                                "What is the name of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(shoeName); // WE HAVE A PROBLEM HERE (SENDS SHOENAME TO SERVER)
+                        storeName = JOptionPane.showInputDialog(null,
+                                "What is the name of the store you would like to remove the shoe from?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName);
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        if (storeIndex.equals("-1")) {
+                            JOptionPane.showMessageDialog(null, "You do not own this store!",
+                                    "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            String shoeDescription = JOptionPane.showInputDialog(null, "What is the " +
+                                    "description of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeDescription);
+                            String shoePrice = JOptionPane.showInputDialog(null, "What is the " +
+                                    "price of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoePrice);
+                            String shoeQuantity  = JOptionPane.showInputDialog(null, "What is the quantity of the " +
+                                    "shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeQuantity);
+                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS REMOVED FROM THE STORE
+                            if (addShoeResult.equalsIgnoreCase("Shoe Removed!")) {
+                                JOptionPane.showMessageDialog(null, "Shoe removed successfully!",
+                                        "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                            } else if (addShoeResult.equalsIgnoreCase(storeName + " does not own " + shoeName  + "'s!")){
+                                JOptionPane.showMessageDialog(null, storeName + " does not own " + shoeName  + "'s!",
+                                        "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+
+                    // EDIT SHOE
+                    if (chosenOption.equalsIgnoreCase("Edit a Shoe")) {
+                        shoeName = JOptionPane.showInputDialog(null, "What shoe do you want to edit",
+                                "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(shoeName);
+                        storeName = JOptionPane.showInputDialog(null, "What store does the shoe " +
+                                "belong to?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName);
+                        String storeIndex = reader.readLine();
+                        if (storeIndex.equals("-1")) {
+                            int num = JOptionPane.showConfirmDialog(null, "You do not own this store!", "Happy Feet",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                            if (num == CLOSED_OPTION) {
+                                return;
+                            }
+                        } else {
+                            String shoeIndex = reader.readLine();
+                            if (shoeIndex.equals("-1")) {
+                                int num = JOptionPane.showConfirmDialog(null, storeName + " does not own this shoe!", "Happy Feet",
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                if (num == CLOSED_OPTION) {
+                                    return;
+                                }
+                            } else {
+                                int choice = JOptionPane.showConfirmDialog(null, "Do you want to change the name of the Shoe?",
+                                        "Happy Feet", JOptionPane.YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Name");
+                                    shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                    while (shoeName == null) {
+                                        shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                    }
+                                    writer.println(shoeName);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                        "the description of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Description");
+                                    String shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                            "description of the Shoe to be?");
+                                    while (shoeDescription == null) {
+                                        shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                                "description of the Shoe to be?");
+                                    }
+                                    writer.println(shoeDescription);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                        "the price of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Price");
+                                    String shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
+                                            "price of the Shoe to be?");
+                                    while (shoePrice == null) {
+                                        shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
+                                                "price of the Shoe to be?");
+                                    }
+                                    writer.println(shoePrice);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change the " +
+                                        "quantity of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Quantity");
+                                    String shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                            "the quantity of the Shoe to be?");
+                                    while (shoeQuantity == null) {
+                                        shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                                "the quantity of the Shoe to be?");
+                                    }
+                                    writer.println(shoeQuantity);
+                                } else {
+                                    writer.println("");
+                                }
+                                String valid = reader.readLine();
+                                if (valid.equals("Y")) {
+                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Successfully Edited!",
+                                            "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
+                                    if (num == CLOSED_OPTION) {
+                                        return;
+                                    }
+                                } else {
+                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Could Not Be Edited",
+                                            "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
+                                    if (num == CLOSED_OPTION) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // VIEW SALES
+                    if (chosenOption.equalsIgnoreCase("View your sales information")) {
+
+                    }
+                    // CHANGE E-MAIL
+                    if(chosenOption.equalsIgnoreCase("Change Email")){
+                        String newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        while(!MarketPlace.checkEmail(newEmail)){
+                            newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        }
+                        writer.println(newEmail);
+                    }
+
+                    if(chosenOption.equalsIgnoreCase("Change Password")){
+                        String newPass;
+                        while(true) {
+                            newPass = JOptionPane.showInputDialog(null, "What do you want your new password to be?");
+                            if(newPass.length() < 5){
+                                JOptionPane.showMessageDialog(null, "Password must be greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                                continue;
+                            }
+                            break;
+                        }
+                        writer.println(newPass);
+                    }
+
+                    // CHANGE PASSWORD
+
+                    // IMPORT PRODUCTS
+
+                    // EXPORT PRODUCTS
+
+
+                    performAnotherActivity = JOptionPane.showConfirmDialog(null,
+                            "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION );
+                    writer.println(performAnotherActivity);
+                } while (performAnotherActivity == YES_OPTION);  //LOOPS OVER SELLER MENU AGAIN IF CLIENT SELECTS YES
+
+
+            } else { // Customer Implementation
+
+            }
+
+
+
+
+
+
+
+
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
+    // establish a connection by providing host and port
+    // number
+
+
+
+
 }
