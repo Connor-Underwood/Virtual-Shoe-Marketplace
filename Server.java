@@ -313,6 +313,37 @@ class Server {
                         }
                         performAnotherActivity = reader.readLine();
                     } while (performAnotherActivity.equals("0"));
+                } else {
+                    int index;
+                    Customer customer;
+                    synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE ACCESSING SHARED DATA
+                        index = -1;
+                        for (Customer c : MarketPlace.customers) {
+                            if (c.getPin().equals(Integer.toString(userPin))) {
+                                index = MarketPlace.sellers.indexOf(c);
+                            }
+                        }
+                        customer = MarketPlace.customers.get(index); // GETS SPECIFIC SELLER
+                    }
+                    String performAnotherActivity = "";
+                    String customerChosenOption = reader.readLine();
+                    if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)){
+                        //TODO
+                    } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
+                        //TODO
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)){
+                        //TODO
+                    } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
+                        //TODO
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+                        //TODO
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
+                        //TODO
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
+                        //TODO
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
+                        //TODO
+                    }
                 }
 
 
