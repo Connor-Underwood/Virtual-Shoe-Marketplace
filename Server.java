@@ -11,6 +11,7 @@ class Server {
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
+
     public void startServer() {
         try {
             while (!serverSocket.isClosed()) {
@@ -24,6 +25,7 @@ class Server {
             closeServer();
         }
     }
+
     public void closeServer() {
         try {
             if (serverSocket != null) {
@@ -83,8 +85,7 @@ class Server {
                         typeOfUser = 2;
                         writer.println("Customer");
                     }
-                }
-                else if (start.equals("Create")) { // Client is trying to Create An Account
+                } else if (start.equals("Create")) { // Client is trying to Create An Account
                     Random random = new Random(); // Used to create the pin value for the client
                     MarketPlace.createAccountsFile(); // if accounts.csv doesn't exist, we create it here
                     String email = reader.readLine(); // receive E-Mail from Client
@@ -159,64 +160,144 @@ class Server {
                         }
                         seller = MarketPlace.sellers.get(index); // GETS SPECIFIC SELLER
                     }
+                    String performAnotherActivity = "";
+                    do {
+                        String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
 
-                    String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
-
-                    if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
-                        String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
-                        Store tempStore;
-                        synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                            tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
-                            if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
-                                writer.println("Store added");
-                            } else {
-                                writer.println("Store already exists");
+                        if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
+                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
+                            Store tempStore;
+                            synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                                tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
+                                if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
+                                    writer.println("Store added");
+                                } else {
+                                    writer.println("You already own this store!");
+                                }
+                                MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
                             }
-                            MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
                         }
-                    }
-
-                    if (sellerSelectedOption.equalsIgnoreCase("Add a shoe")) {
-                        String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
-                        int storeIndex = -1;
-                        synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
-                            for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
-                                if (seller.getStores().get(i).getName().equals(storeName)) {
-                                    storeIndex = i;
+                        if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
+                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
+                            int storeIndex = -1;
+                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
+                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
+                                    if (seller.getStores().get(i).getName().equals(storeName)) {
+                                        storeIndex = i;
+                                    }
+                                }
+                                writer.println(storeIndex);
+                                // writer.flush();
+                            }
+                            if (storeIndex != -1) {
+                                Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
+                                // GETS ALL SHOE DETAILS FROM CLIENT
+                                String shoeName = reader.readLine();
+                                String shoeDesc = reader.readLine();
+                                double price = Double.parseDouble(reader.readLine());
+                                int quantity = Integer.parseInt(reader.readLine());
+                                synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                                    Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
+                                    if (seller.addShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
+                                        MarketPlace.sellers.set(index, seller);
+                                        writer.println("Shoe added");
+                                    } else {
+                                        writer.println("Shoe could not be added");
+                                    }
                                 }
                             }
-                            writer.println(storeIndex);
-                            // writer.flush();
                         }
-                        Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
-                        // GETS ALL SHOE DETAILS FROM CLIENT
-                        String shoeName = reader.readLine();
-                        String shoeDesc =  reader.readLine();
-                        double price = Double.parseDouble(reader.readLine());
-                        int quantity = Integer.parseInt(reader.readLine());
-                        synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                            Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
-                            if (seller.addShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
-                                MarketPlace.sellers.set(index, seller);
-                                writer.println("Shoe added");
-                            } else {
-                                writer.println("Shoe could not be added");
+                        if (sellerSelectedOption.equalsIgnoreCase("Remove a shoe")) {
+                            String shoeName = reader.readLine();
+                            String storeName = reader.readLine();
+                            int storeIndex = -1;
+                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
+                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
+                                    if (seller.getStores().get(i).getName().equals(storeName)) {
+                                        storeIndex = i;
+                                    }
+                                }
+                                writer.println(storeIndex);
+                            }
+                            if (storeIndex != -1) {
+                                Store store = seller.getStores().get(storeIndex); // GETS STORE THAT THE SHOE NEEDS TO BE ADDED TO
+                                // GETS ALL SHOE DETAILS FROM CLIENT
+                                String shoeDesc = reader.readLine();
+                                double price = Double.parseDouble(reader.readLine());
+                                int quantity = Integer.parseInt(reader.readLine());
+                                synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                                    Shoe shoe = new Shoe(store, shoeName, shoeDesc, price, quantity); // PLACEHOLDER TO ADD TO THE STORE'S ARRAYLIST OF SHOES
+                                    if (seller.removeShoe(store, shoe, true)) { // CHECKS IF SHOE HAS BEEN ADDED SUCCESSFULLY
+                                        MarketPlace.sellers.set(index, seller);
+                                        writer.println("Shoe removed!");
+                                    } else {
+                                        writer.println(storeName + " does not own " + shoeName  + "'s!");
+                                    }
+                                }
+                            }
+
+                        }
+                        if (sellerSelectedOption.equalsIgnoreCase("Edit a Shoe")) {
+                            String shoeName = reader.readLine();
+                            String storeName = reader.readLine();
+                            int storeIndex = -1;
+                            synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
+                                for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
+                                    if (seller.getStores().get(i).getName().equals(storeName)) {
+                                        storeIndex = i;
+                                    }
+                                }
+                                writer.println(storeIndex);
+                            }
+                            if (storeIndex != -1) {
+                                Store store = seller.getStores().get(storeIndex);
+                                int shoeIndex = -1;
+                                synchronized (GATEKEEPER) {
+                                    for (int i = 0; i < store.getShoes().size(); i++) {
+                                        if (store.getShoes().get(i).getName().equalsIgnoreCase(shoeName)) {
+                                            shoeIndex = i;
+                                        }
+                                    }
+                                    writer.println(shoeIndex);
+                                }
+                                if (shoeIndex != -1) {
+                                    Shoe shoe = store.getShoes().get(shoeIndex);
+                                    seller.removeShoe(store, shoe, true);
+                                    String newShoeName = shoe.getName();
+                                    String newShoeDescription = shoe.getDescription();
+                                    String newPrice = String.valueOf(shoe.getPrice());
+                                    String newQuantity = Integer.toString(shoe.getQuantity());
+                                    String changeShoeName = reader.readLine();
+                                    if (changeShoeName.equals("Change Shoe Name")) {
+                                        newShoeName = reader.readLine();
+                                    }
+                                    String changeShoeDesc = reader.readLine();
+                                    if (changeShoeDesc.equals("Change Shoe Description")) {
+                                        newShoeDescription = reader.readLine();
+                                    }
+                                    String changeShoePrice = reader.readLine();
+                                    if (changeShoePrice.equals("Change Shoe Price")) {
+                                        newPrice = reader.readLine();
+                                    }
+                                    String changeShoeQuantity = reader.readLine();
+                                    if (changeShoeQuantity.equals("Change Shoe Quantity")) {
+                                        newQuantity = reader.readLine();
+                                    }
+                                    synchronized (GATEKEEPER) {
+                                        seller.addShoe(store, new Shoe(store, newShoeName, newShoeDescription, Double.parseDouble(newPrice),
+                                                Integer.parseInt(newQuantity)), true);
+                                        MarketPlace.sellers.set(index, seller);
+                                    }
+                                    writer.println("Y");
+                                }
                             }
                         }
-                    }
+                        if (sellerSelectedOption.equalsIgnoreCase("View Sales")) {
+
+                        }
+                        performAnotherActivity = reader.readLine();
+                    } while (performAnotherActivity.equals("0"));
                 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             } catch (IOException io) {
