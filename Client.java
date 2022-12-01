@@ -2,8 +2,7 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 
-
-import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.*;
 
 // Client class
 public class Client {
@@ -163,9 +162,9 @@ public class Client {
                         JOptionPane.PLAIN_MESSAGE);
 
                 int performAnotherActivity;
-                String[] sellerMenuOptions = {"Add a Store", "Add a new Shoe", "Remove a Shoe", "Edit a Shoe",
-                "View your sales information", "Change Email", "Change Password", "Import products from a file",
-                "Export products to a file"};
+                String[] sellerMenuOptions = {"Add a Store", "Add a New Shoe", "Remove a Shoe", "Edit a Shoe",
+                        "View your sales information", "Change Email", "Change Password", "Import products from a file",
+                        "Export products to a file"};
 
                 // PRESENTS SELLER MENU
                 do {
@@ -180,11 +179,11 @@ public class Client {
                         storeName = JOptionPane.showInputDialog(null, "What is the name of" +
                                 "the store you would like to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                         writer.println(storeName); // SENDS STORENAME TO THE SERVER
-                        String addStoreResult = reader.readLine(); // USED TO CHECK IF STORE IS ADDED 
+                        String addStoreResult = reader.readLine(); // USED TO CHECK IF STORE IS ADDED
                         if (addStoreResult.equalsIgnoreCase("Store added")) {
                             JOptionPane.showMessageDialog(null, "Store added successfully!",
                                     "Happy Feet", JOptionPane.PLAIN_MESSAGE);
-                        } else if (addStoreResult.equalsIgnoreCase("Store already exists")) {
+                        } else if (addStoreResult.equalsIgnoreCase("You already own this store!")) {
                             JOptionPane.showMessageDialog(null, "You already own the store!",
                                     null, JOptionPane.ERROR_MESSAGE);
                         }
@@ -196,7 +195,7 @@ public class Client {
                                 " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                         writer.println(storeName); // WE HAVE A PROBLEM HERE (SENDS STORENAME TO THE SERVER)
                         String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
-                        if (storeIndex.equals("-1")) { 
+                        if (storeIndex.equals("-1")) {
                             JOptionPane.showMessageDialog(null, "You do not own this store!",
                                     "Happy Feet", JOptionPane.ERROR_MESSAGE);
                         } else {
@@ -223,9 +222,151 @@ public class Client {
                         }
                     }
 
+                    // REMOVE SHOE
+                    if (chosenOption.equalsIgnoreCase("Remove a Shoe")) {
+                        shoeName = JOptionPane.showInputDialog(null,
+                                "What is the name of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(shoeName); // WE HAVE A PROBLEM HERE (SENDS SHOENAME TO SERVER)
+                        storeName = JOptionPane.showInputDialog(null,
+                                "What is the name of the store you would like to remove the shoe from?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName);
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        if (storeIndex.equals("-1")) {
+                            JOptionPane.showMessageDialog(null, "You do not own this store!",
+                                    "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            String shoeDescription = JOptionPane.showInputDialog(null, "What is the " +
+                                    "description of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeDescription);
+                            String shoePrice = JOptionPane.showInputDialog(null, "What is the " +
+                                    "price of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoePrice);
+                            String shoeQuantity  = JOptionPane.showInputDialog(null, "What is the quantity of the " +
+                                    "shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            writer.println(shoeQuantity);
+                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS REMOVED FROM THE STORE
+                            if (addShoeResult.equalsIgnoreCase("Shoe Removed!")) {
+                                JOptionPane.showMessageDialog(null, "Shoe removed successfully!",
+                                        "Happy Feet", JOptionPane.PLAIN_MESSAGE);
+                            } else if (addShoeResult.equalsIgnoreCase(storeName + " does not own " + shoeName  + "'s!")){
+                                JOptionPane.showMessageDialog(null, storeName + " does not own " + shoeName  + "'s!",
+                                        "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+
+                    // EDIT SHOE
+                    if (chosenOption.equalsIgnoreCase("Edit a Shoe")) {
+                        shoeName = JOptionPane.showInputDialog(null, "What shoe do you want to edit",
+                                "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(shoeName);
+                        storeName = JOptionPane.showInputDialog(null, "What store does the shoe " +
+                                "belong to?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(storeName);
+                        String storeIndex = reader.readLine();
+                        if (storeIndex.equals("-1")) {
+                            int num = JOptionPane.showConfirmDialog(null, "You do not own this store!", "Happy Feet",
+                                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                            if (num == CLOSED_OPTION) {
+                                return;
+                            }
+                        } else {
+                            String shoeIndex = reader.readLine();
+                            if (shoeIndex.equals("-1")) {
+                                int num = JOptionPane.showConfirmDialog(null, storeName + " does not own this shoe!", "Happy Feet",
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                if (num == CLOSED_OPTION) {
+                                    return;
+                                }
+                            } else {
+                                int choice = JOptionPane.showConfirmDialog(null, "Do you want to change the name of the Shoe?",
+                                        "Happy Feet", JOptionPane.YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Name");
+                                    shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                    while (shoeName == null) {
+                                        shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                    }
+                                    writer.println(shoeName);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                        "the description of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Description");
+                                    String shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                            "description of the Shoe to be?");
+                                    while (shoeDescription == null) {
+                                        shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                                "description of the Shoe to be?");
+                                    }
+                                    writer.println(shoeDescription);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                        "the price of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Price");
+                                    String shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
+                                            "price of the Shoe to be?");
+                                    while (shoePrice == null) {
+                                        shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
+                                                "price of the Shoe to be?");
+                                    }
+                                    writer.println(shoePrice);
+                                } else {
+                                    writer.println("");
+                                }
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change the " +
+                                        "quantity of the Shoe?", "Happy Feet", YES_NO_OPTION);
+                                if (choice == YES_OPTION) {
+                                    writer.println("Change Shoe Quantity");
+                                    String shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                            "the quantity of the Shoe to be?");
+                                    while (shoeQuantity == null) {
+                                        shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                                "the quantity of the Shoe to be?");
+                                    }
+                                    writer.println(shoeQuantity);
+                                } else {
+                                    writer.println("");
+                                }
+                                String valid = reader.readLine();
+                                if (valid.equals("Y")) {
+                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Successfully Edited!",
+                                            "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
+                                    if (num == CLOSED_OPTION) {
+                                        return;
+                                    }
+                                } else {
+                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Could Not Be Edited",
+                                            "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
+                                    if (num == CLOSED_OPTION) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // VIEW SALES
+                    if (chosenOption.equalsIgnoreCase("View your sales information")) {
+
+                    }
+                    // CHANGE E-MAIL
+                    
+                    // CHANGE PASSWORD
+
+                    // IMPORT PRODUCTS
+
+                    // EXPORT PRODUCTS
+
 
                     performAnotherActivity = JOptionPane.showConfirmDialog(null,
                             "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION );
+                    writer.println(performAnotherActivity);
                 } while (performAnotherActivity == YES_OPTION);  //LOOPS OVER SELLER MENU AGAIN IF CLIENT SELECTS YES
 
 
