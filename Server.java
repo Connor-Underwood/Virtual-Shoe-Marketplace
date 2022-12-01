@@ -336,9 +336,17 @@ class Server {
                     } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        //TODO
+                        String newEmail = reader.readLine();
+                        synchronized (GATEKEEPER) {
+                            customer.setEmail(newEmail);
+                            MarketPlace.customers.set(index, customer);
+                        }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
-                        //TODO
+                        String newPass = reader.readLine();
+                        synchronized (GATEKEEPER){
+                            customer.setPassword(newPass);
+                            MarketPlace.customers.set(index, customer);
+                        }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
