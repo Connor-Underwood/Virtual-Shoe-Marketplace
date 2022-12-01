@@ -415,9 +415,22 @@ public class Client {
                     } else if(chosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
                         //TODO
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        //TODO
+                        String newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        while(!MarketPlace.checkEmail(newEmail)){
+                            newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        }
+                        writer.println(newEmail);
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
-                        //TODO
+                        String newPass;
+                        while(true) {
+                            newPass = JOptionPane.showInputDialog(null, "What do you want your new password to be?");
+                            if(newPass.length() < 5){
+                                JOptionPane.showMessageDialog(null, "Password must be greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                                continue;
+                            }
+                            break;
+                        }
+                        writer.println(newPass);
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                         //TODO
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
