@@ -356,7 +356,27 @@ public class Client {
 
                     }
                     // CHANGE E-MAIL
-                    
+                    if(chosenOption.equalsIgnoreCase("Change Email")){
+                        String newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        while(!MarketPlace.checkEmail(newEmail)){
+                            newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        }
+                        writer.println(newEmail);
+                    }
+
+                    if(chosenOption.equalsIgnoreCase("Change Password")){
+                        String newPass;
+                        while(true) {
+                            newPass = JOptionPane.showInputDialog(null, "What do you want your new password to be?");
+                            if(newPass.length() < 5){
+                                JOptionPane.showMessageDialog(null, "Password must be greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                                continue;
+                            }
+                            break;
+                        }
+                        writer.println(newPass);
+                    }
+
                     // CHANGE PASSWORD
 
                     // IMPORT PRODUCTS
