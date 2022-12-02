@@ -204,7 +204,7 @@ public class Customer {
      * @param search Boolean value. Will ask in main if user would like to search
      * @param searchString If search is true, set searchString to their input. Otherwise, set searchString to "" empty string
      */
-    public void viewMarket(boolean search, String searchString, int searchNum) {
+    public String viewMarket(boolean search, String searchString, int searchNum) {
         if (search) {
 //             1: search by store name
 //             2: search by name
@@ -229,14 +229,16 @@ public class Customer {
                         }
                     }
                 } catch (IOException io) {
-                    System.out.println("Error reading to the market.csv file.");
+                    return "Error reading to the market.csv file.";
                 }
                 if (storeStrings.size() == 0) {
-                    System.out.println("Sorry, we could find any shoes based on that search");
+                    return "Sorry, we could find any shoes based on that search";
                 } else {
+                    String s = "";
                     for (int i = 0; i < storeStrings.size(); i++) {
-                        System.out.println(storeStrings.get(i));
+                        s += storeStrings.get(i);
                     }
+                    return s;
                 }
             }
             else if (searchNum == 2) {
@@ -259,14 +261,16 @@ public class Customer {
                         }
                     }
                 } catch (IOException io) {
-                    System.out.println("Error reading to the market.csv file.");
+                    return "Error reading to the market.csv file.";
                 }
                 if (shoeStrings.size() == 0) {
-                    System.out.println("Sorry, we could find any shoes based on that search");
+                    return "Sorry, we could find any shoes based on that search";
                 } else {
+                    String s = "";
                     for (int i = 0; i < shoeStrings.size(); i++) {
-                        System.out.println(shoeStrings.get(i));
+                        s += shoeStrings.get(i) + "\n";
                     }
+                    return s;
                 }
             }
             else if (searchNum == 3) {
@@ -289,14 +293,16 @@ public class Customer {
                         }
                     }
                 } catch (IOException io) {
-                    System.out.println("Error reading to the market.csv file.");
+                    return "Error reading to the market.csv file.";
                 }
                 if (descStrings.size() == 0) {
-                    System.out.println("Sorry, we could find any shoes based on that search");
+                    return "Sorry, we could find any shoes based on that search";
                 } else {
+                    String s = "";
                     for (int i = 0; i < descStrings.size(); i++) {
-                        System.out.println(descStrings.get(i));
+                        s += descStrings.get(i);
                     }
+                    return s;
                 }
             }
             else if (searchNum == 4) {
@@ -319,14 +325,16 @@ public class Customer {
                         }
                     }
                 } catch (IOException io) {
-                    System.out.println("Error reading to the market.csv file.");
+                    return "Error reading to the market.csv file.";
                 }
                 if (priceStrings.size() == 0) {
-                    System.out.println("Sorry, we could find any shoes based on that search");
+                    return "Sorry, we could find any shoes based on that search";
                 } else {
+                    String s = "";
                     for (int i = 0; i < priceStrings.size(); i++) {
-                        System.out.println(priceStrings.get(i));
+                        s += priceStrings.get(i);
                     }
+                    return s;
                 }
             }
             else {
@@ -349,14 +357,16 @@ public class Customer {
                         }
                     }
                 } catch (IOException io) {
-                    System.out.println("Error reading to the market.csv file.");
+                    return "Error reading to the market.csv file.";
                 }
                 if (quantityStrings.size() == 0) {
-                    System.out.println("Sorry, we could find any shoes based on that search");
+                    return "Sorry, we could find any shoes based on that search";
                 } else {
+                    String s = "";
                     for (int i = 0; i < quantityStrings.size(); i++) {
-                        System.out.println(quantityStrings.get(i));
+                        s += quantityStrings.get(i);
                     }
+                    return s;
                 }
             }
         }
@@ -378,21 +388,23 @@ public class Customer {
 
                 }
             } catch (IOException io) {
-                System.out.println("Error reading to the market.csv file.");
+                return "Error reading to the market.csv file.";
             }
             File f = new File(this.email + ".txt");
             try {
                 boolean b = f.createNewFile();
             } catch (IOException io) {
-                System.out.println("Error creating new file.");
+                return "Error creating new file.";
             }
             try (PrintWriter writer = new PrintWriter(new FileWriter(f))) {
+                String s = "";
                 for (int i = 0; i < market.size(); i++) {
                     writer.println(market.get(i));
-                    System.out.println(market.get(i));
+                    s += market.get(i);
                 }
+                return s;
             } catch (IOException io) {
-                System.out.println("Error writing to file.");
+                return "Error writing to file.";
             }
         }
     } // use to search and view the market in market.csv
