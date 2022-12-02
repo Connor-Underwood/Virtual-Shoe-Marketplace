@@ -47,12 +47,19 @@ class Server {
         private BufferedReader reader;
         private PrintWriter writer;
 
+        private ObjectOutputStream oos;
+
+        private ObjectInputStream ois;
+
         // Constructor
         public ClientHandler(Socket socket) throws IOException {
             this.clientSocket = socket;
             this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
             clientHandlers.add(this);
+            this.ois = new ObjectInputStream(clientSocket.getInputStream());
+            this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
+
         }
 
         public void run() {
@@ -350,11 +357,16 @@ class Server {
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
                         String option = reader.readLine();
                         if (option.equals("No")) {
-                            writer.println(MarketPlace.viewStoreStatistics(false, -1, ""));
+                            System.out.println(MarketPlace.viewStoreStatistics(false, -1, ""));
+                            oos.writeObject(MarketPlace.viewStoreStatistics(false, -1, ""));
+                            oos.flush();
                         } else if (option.equals("Sort by number of products sold in every store")) {
-                            writer.println(MarketPlace.viewStoreStatistics(true,1,""));
+                            System.out.println(MarketPlace.viewStoreStatistics(true,1,""));
+                            oos.writeObject(MarketPlace.viewStoreStatistics(true,1,""));
+                            oos.flush();
                         } else {
-                            writer.println(MarketPlace.viewStoreStatistics(true, 2, customer.getPin()));
+                            oos.writeObject(MarketPlace.viewStoreStatistics(true, 2, customer.getPin()));
+                            oos.flush();
                         }
                     }
                 }
