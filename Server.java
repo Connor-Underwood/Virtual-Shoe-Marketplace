@@ -46,10 +46,8 @@ class Server {
         private Socket clientSocket;
         private BufferedReader reader;
         private PrintWriter writer;
-
-        private ObjectOutputStream oos;
-
         private ObjectInputStream ois;
+        private ObjectOutputStream oos;
 
         // Constructor
         public ClientHandler(Socket socket) throws IOException {
@@ -57,9 +55,8 @@ class Server {
             this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
             clientHandlers.add(this);
-            this.ois = new ObjectInputStream(clientSocket.getInputStream());
             this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
-
+            this.ois = new ObjectInputStream(clientSocket.getInputStream());
         }
 
         public void run() {
@@ -108,15 +105,15 @@ class Server {
 
                     if (userType.equals("Seller")) { // We create the Pin for that Seller
                         typeOfUser = 1;
-                        userPin = random.nextInt(1000, 9999);
+                        //userPin = random.nextInt(1000, 9999);
                         while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            userPin = random.nextInt(1000, 9999);
+                            //userPin = random.nextInt(1000, 9999);
                         }
                     } else {
                         typeOfUser = 2;
-                        userPin = random.nextInt(10000, 99999); // We create the Pin for that Customer
+                        //userPin = random.nextInt(10000, 99999); // We create the Pin for that Customer
                         while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            userPin = random.nextInt(10000, 99999);
+                            //userPin = random.nextInt(10000, 99999);
                         }
                     }
                     synchronized (GATEKEEPER) { // THIS MUST BE SYNCHRONIZED BECAUSE WE ARE ACCESSING SHARED INFORMATION
@@ -303,11 +300,11 @@ class Server {
 
                         }
                         if(sellerSelectedOption.equalsIgnoreCase("Change Email")){
-                            String newEmail = reader.readLine();
-                            synchronized (GATEKEEPER) {
-                                seller.setEmail(newEmail);
-                                MarketPlace.sellers.set(index, seller);
-                            }
+                           String newEmail = reader.readLine();
+                           synchronized (GATEKEEPER) {
+                               seller.setEmail(newEmail);
+                               MarketPlace.sellers.set(index, seller);
+                           }
                         }
 
                         if(sellerSelectedOption.equalsIgnoreCase("Change Password")){
@@ -337,7 +334,33 @@ class Server {
                     if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)){
                         //TODO
                     } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
-                        //TODO
+                        String searchChoice = reader.readLine();
+                        if(searchChoice.equalsIgnoreCase("Search by store name.")){
+                            String store = reader.readLine();
+                            String retun = customer.viewMarket(true, store, 1);
+                            oos.writeObject(retun);
+                            oos.flush();
+                        } else if(searchChoice.equalsIgnoreCase("Search by Shoe Name.")){
+                            String store = reader.readLine();
+                            String retun = customer.viewMarket(true, store, 2);
+                            oos.writeObject(retun);
+                            oos.flush();
+                        } else if(searchChoice.equalsIgnoreCase("Search by Shoe Description.")){
+                            String store = reader.readLine();
+                            String retun = customer.viewMarket(true, store, 3);
+                            oos.writeObject(retun);
+                            oos.flush();
+                        } else if(searchChoice.equalsIgnoreCase("Sort by price.")){
+                            String store = reader.readLine();
+                            String retun = customer.viewMarket(true, store, 4);
+                            oos.writeObject(retun);
+                            oos.flush();
+                        } else if(searchChoice.equalsIgnoreCase("Sort by quantity")){
+                            String store = reader.readLine();
+                            String retun = customer.viewMarket(true, store, 5);
+                            oos.writeObject(retun);
+                            oos.flush();
+                        }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)){
                         synchronized (GATEKEEPER) {
                             writer.println(customer.viewPurchaseHistory(false));
@@ -349,9 +372,17 @@ class Server {
                             MarketPlace.customers.set(index, customer);
                         }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        //TODO
+                        String newEmail = reader.readLine();
+                        synchronized (GATEKEEPER) {
+                            customer.setEmail(newEmail);
+                            MarketPlace.customers.set(index, customer);
+                        }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
-                        //TODO
+                        String newPass = reader.readLine();
+                        synchronized (GATEKEEPER){
+                            customer.setPassword(newPass);
+                            MarketPlace.customers.set(index, customer);
+                        }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
