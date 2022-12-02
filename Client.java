@@ -8,6 +8,8 @@ import static javax.swing.JOptionPane.*;
 public class Client {
     private PrintWriter writer;
     private BufferedReader reader;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
 
     // find some way to differentiate clients in server
 
@@ -20,6 +22,9 @@ public class Client {
 
             // reading from server
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
             String[] welcomePage = {"Login", "Create An Account"}; // Welcomes the Client presents drop down menu
             // to login or create account
@@ -443,14 +448,18 @@ public class Client {
                                 "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, options, 0);
                         if (sortBy.equals("Sort by number of products sold in every store")) {
                             writer.println("Sort by number of products sold in every store");
-                            JOptionPane.showMessageDialog(null, reader.readLine());
+                            String result = (String) ois.readObject();
+                            JOptionPane.showMessageDialog(null, result);
                         } else {
+                            String result = (String) ois.readObject();
                             writer.println("Sort by number of products sold in stores you have purchased from");
-                            JOptionPane.showMessageDialog(null, reader.readLine());
+                            JOptionPane.showMessageDialog(null, result);
                         }
                     } else {
                         writer.println("No");
-                        JOptionPane.showMessageDialog(null, reader.readLine());
+                        String result = (String) ois.readObject();
+                        JOptionPane.showMessageDialog(null, result);
+
                     }
                 }
             }
@@ -466,6 +475,8 @@ public class Client {
         }
         catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
     // establish a connection by providing host and port
