@@ -296,11 +296,11 @@ class Server {
 
                         }
                         if(sellerSelectedOption.equalsIgnoreCase("Change Email")){
-                           String newEmail = reader.readLine();
-                           synchronized (GATEKEEPER) {
-                               seller.setEmail(newEmail);
-                               MarketPlace.sellers.set(index, seller);
-                           }
+                            String newEmail = reader.readLine();
+                            synchronized (GATEKEEPER) {
+                                seller.setEmail(newEmail);
+                                MarketPlace.sellers.set(index, seller);
+                            }
                         }
 
                         if(sellerSelectedOption.equalsIgnoreCase("Change Password")){
@@ -320,7 +320,7 @@ class Server {
                         index = -1;
                         for (Customer c : MarketPlace.customers) {
                             if (c.getPin().equals(Integer.toString(userPin))) {
-                                index = MarketPlace.sellers.indexOf(c);
+                                index = MarketPlace.customers.indexOf(c);
                             }
                         }
                         customer = MarketPlace.customers.get(index); // GETS SPECIFIC SELLER
@@ -332,25 +332,30 @@ class Server {
                     } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)){
-                        //TODO
-                    } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
-                        //TODO
-                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        String newEmail = reader.readLine();
                         synchronized (GATEKEEPER) {
-                            customer.setEmail(newEmail);
+                            writer.println(customer.viewPurchaseHistory(false));
                             MarketPlace.customers.set(index, customer);
                         }
+                    } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)){
+                        synchronized (GATEKEEPER) {
+                            writer.println(customer.viewPurchaseHistory(true));
+                            MarketPlace.customers.set(index, customer);
+                        }
+                    } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+                        //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
-                        String newPass = reader.readLine();
-                        synchronized (GATEKEEPER){
-                            customer.setPassword(newPass);
-                            MarketPlace.customers.set(index, customer);
-                        }
+                        //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
-                        //TODO
+                        String option = reader.readLine();
+                        if (option.equals("No")) {
+                            writer.println(MarketPlace.viewStoreStatistics(false, -1, ""));
+                        } else if (option.equals("Sort by number of products sold in every store")) {
+                            writer.println(MarketPlace.viewStoreStatistics(true,1,""));
+                        } else {
+                            writer.println(MarketPlace.viewStoreStatistics(true, 2, customer.getPin()));
+                        }
                     }
                 }
 
