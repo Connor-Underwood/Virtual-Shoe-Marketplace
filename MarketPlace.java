@@ -314,10 +314,10 @@ public class MarketPlace {
         try (BufferedReader reader = new BufferedReader(new FileReader("accounts.csv"))) {
             String line = "";
             while((line = reader.readLine()) != null) {
-              String[] arr = line.split(",");
-              if (arr[1].equals(email) && arr[2].equals(password)) {
-                  return (arr[0]);
-              }
+                String[] arr = line.split(",");
+                if (arr[1].equals(email) && arr[2].equals(password)) {
+                    return (arr[0]);
+                }
             }
             return "Neither";
         } catch (IOException io) {
@@ -351,7 +351,7 @@ public class MarketPlace {
             }
         }
     }
-    public static void viewStoreStatistics(boolean sort, int sortNum, String customerPin) {
+    public static String viewStoreStatistics(boolean sort, int sortNum, String customerPin) {
         /**
          * Customers can view a dashboard with store and seller information.
          * Data will include a list of stores by number of products sold and
@@ -368,10 +368,12 @@ public class MarketPlace {
                 }
                 stores.sort(Comparator.comparingInt(Store::getSales));
                 int count = 1;
+                String s = "";
                 for (int i = stores.size() - 1; i >= 0; i--) {
-                    System.out.println("Store " + (count) + ": " + stores.get(i).getName() + " --> " + stores.get(i).getSales() + " sales.");
+                    s += "Store " + (count) + ": " + stores.get(i).getName() + " --> " + stores.get(i).getSales() + " sales." + "\n";
                     count++;
                 }
+                return s;
             }
             else {
                 int index = -1;
@@ -386,23 +388,27 @@ public class MarketPlace {
                     stores.add(customer.getPurchaseHistory().get(i).getStore());
                 }
                 stores.sort(Comparator.comparingInt(Store::getSales));
+                String s = "";
                 if (stores.size() != 0) {
                     for (int i = stores.size() - 1; i >= 0; i--) {
-                        System.out.println("Seller " + stores.get(i).getSeller().getEmail() + ":");
-                        System.out.println("Store " + stores.get(i).getName() + ": " + stores.get(i).getSales());
+                        s += "Seller " + stores.get(i).getSeller().getEmail() + ":" + "\n";
+                        s += "Store " + stores.get(i).getName() + ": " + stores.get(i).getSales() + "\n";
                     }
+                    return s;
                 } else {
-                    System.out.println("You have not purchased from any stores yet.");
+                    return "You have not purchased from any stores yet.";
                 }
             }
         } else {
+            String s = "";
             for (int i = 0; i < sellers.size(); i++) {
-                System.out.println("Seller " + (i+1) + ": "+ sellers.get(i).getEmail());
+                s += "Seller " + (i+1) + ": "+ sellers.get(i).getEmail() + "\n";
                 for (int j = 0; j < sellers.get(i).getStores().size(); j++) {
-                    System.out.println("Store " + (j+1) + ": " + sellers.get(i).getStores().get(j).getName()
-                            + " --> " +sellers.get(i).getStores().get(j).getSales() + " sales." );
+                    s += "Store " + (j+1) + ": " + sellers.get(i).getStores().get(j).getName()
+                            + " --> " +sellers.get(i).getStores().get(j).getSales() + " sales."  + "\n";
                 }
             }
+            return s;
         }
 
     }
