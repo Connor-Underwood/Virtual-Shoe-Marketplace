@@ -105,15 +105,15 @@ class Server {
 
                     if (userType.equals("Seller")) { // We create the Pin for that Seller
                         typeOfUser = 1;
-                        //userPin = random.nextInt(1000, 9999);
+                        userPin = random.nextInt(1000, 9999);
                         while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            //userPin = random.nextInt(1000, 9999);
+                            userPin = random.nextInt(1000, 9999);
                         }
                     } else {
                         typeOfUser = 2;
-                        //userPin = random.nextInt(10000, 99999); // We create the Pin for that Customer
+                        userPin = random.nextInt(10000, 99999); // We create the Pin for that Customer
                         while (!MarketPlace.checkPin(Integer.toString(userPin))) { // make sure pin is not taken
-                            //userPin = random.nextInt(10000, 99999);
+                            userPin = random.nextInt(10000, 99999);
                         }
                     }
                     synchronized (GATEKEEPER) { // THIS MUST BE SYNCHRONIZED BECAUSE WE ARE ACCESSING SHARED INFORMATION
@@ -166,7 +166,7 @@ class Server {
                     }
                     String performAnotherActivity = "";
                     do {
-                        String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
+                        String sellerSelectedOption = reader.readLine(); // RECEIVES SELECTED OPTION FROM THE CLIENT END
 
                         if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
                             String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
@@ -182,7 +182,7 @@ class Server {
                             }
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
-                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
+                            String storeName = reader.readLine(); // RECEIVES STORENAME FROM CLIENT
                             int storeIndex = -1;
                             synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
                                 for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
@@ -300,11 +300,11 @@ class Server {
 
                         }
                         if(sellerSelectedOption.equalsIgnoreCase("Change Email")){
-                           String newEmail = reader.readLine();
-                           synchronized (GATEKEEPER) {
-                               seller.setEmail(newEmail);
-                               MarketPlace.sellers.set(index, seller);
-                           }
+                            String newEmail = reader.readLine();
+                            synchronized (GATEKEEPER) {
+                                seller.setEmail(newEmail);
+                                MarketPlace.sellers.set(index, seller);
+                            }
                         }
 
                         if(sellerSelectedOption.equalsIgnoreCase("Change Password")){
@@ -331,8 +331,36 @@ class Server {
                     }
                     String performAnotherActivity = "";
                     String customerChosenOption = reader.readLine();
-                    if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)){
-                        //TODO
+                    if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)) {
+                        ArrayList<ArrayList<String>> marketList = new ArrayList<>();
+                        ArrayList<String> shoeInTheMarket = new ArrayList<>();
+                        for (Seller seller: MarketPlace.sellers) {
+                            for (Store store: seller.getStores()) {
+                                for (Shoe shoe: store.getShoes()) {
+                                    shoeInTheMarket = new ArrayList<>();
+                                    shoeInTheMarket.add(seller.getEmail());
+                                    shoeInTheMarket.add(shoe.getStore().getName());
+                                    shoeInTheMarket.add(shoe.getName());
+                                    shoeInTheMarket.add(String.valueOf(shoe.getPrice()));
+                                }
+                                marketList.add(shoeInTheMarket);
+                            }
+                        }
+                        for (int i = 0; i <= marketList.size(); i++) {
+                            if (i == marketList.size()) {
+                                writer.println("done writing");
+                            } else {
+                                writer.println("continue");
+                                for (int j = 0; j <= 4; j++) {
+                                    if (j == 4) {
+                                        writer.println("done");
+                                    } else {
+                                        writer.println(marketList.get(i).get(j));
+                                    }
+                                }
+                            }
+                        }
+
                     } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
                         String searchChoice = reader.readLine();
                         if(searchChoice.equalsIgnoreCase("Search by store name.")){
