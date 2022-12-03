@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
+import java.util.ArrayList;
 
 import static javax.swing.JOptionPane.*;
 
@@ -15,6 +17,7 @@ public class Client {
 
     //public static void main(String[] args) {
     public static void main(String[] args) {
+        MarketPlace marketPlace = new MarketPlace();
         try (Socket socket = new Socket("localhost", 1234)) {
 
             // writing to server
@@ -413,7 +416,31 @@ public class Client {
                 // SENDS THE CHOSEN OPTION TO THE SERVER
                 writer.println(chosenOption);
                 if (chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)) {
-                    //TODO
+                    writer.println("Start");
+                    Object[] cols = {"Seller ID", "Store Name", "Shoe Name", "Shoe Price"};
+                    ArrayList<ArrayList<String>> marketList = new ArrayList<>();
+                    ArrayList<String> shoe = new ArrayList<>();
+                    String response;
+                    while (!(reader.readLine().equals("done writing"))) {
+                        while(!((response = reader.readLine())).equals("done")) {
+                            shoe.add(response);
+                        }
+                        marketList.add(shoe);
+                        shoe = new ArrayList<>();
+                    }
+                    if (marketList.size() == 0) {
+                        JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                "Happy Feet", ERROR_MESSAGE);
+                    } else {
+                        Object[][] rows = new Object[marketList.size()][4];
+                        for (int i = 0; i < marketList.size(); i++) {
+                            for (int j = 0; j < 4; j++) {
+                                rows[i][j] = marketList.get(i).get(j);
+                            }
+                        }
+                        JTable table = new JTable(rows, cols);
+                        JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                    }
                 } else if (chosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
                     String[] viewOptions = {"Search by Store Name.", "Search by Shoe Name.", "Search by Shoe Description.", "Sort by Price.", "Sort by Quantity"};
                     String searchChoice = (String) JOptionPane.showInputDialog(null, "Select an Option", "Happy Feet", INFORMATION_MESSAGE, null, viewOptions, 0);
@@ -538,5 +565,4 @@ public class Client {
         }
     }
 }
-
 
