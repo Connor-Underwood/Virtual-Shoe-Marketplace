@@ -11,7 +11,7 @@ public class MarketPlace {
      * This is our main method where input is received from Users
      */
     private static final String WELCOME_MESSAGE = "Welcome to the Shoe Marketplace!";
-    private static final String INVALID_VALUE = "Please enter a valid value.";
+    public static final String INVALID_VALUE = "Please enter a valid value.";
     private static final String INVALID_EMAIL = "Please enter a valid email (Must contain @).";
     private static final String TAKEN_EMAIL = "This e-mail has already been taken!";
     private static final String INVALID_PASSWORD = "Please enter a valid password (Must contain more than 5 characters).";
