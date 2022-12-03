@@ -538,7 +538,7 @@ public class Client {
                                     Integer.parseInt(quantity);
                                     validResponse = true;
                                 } catch (NumberFormatException n) {
-                                    System.out.println(MarketPlace.INVALID_VALUE);
+                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
                                     quantity = JOptionPane.showInputDialog(null, "What is quantity you want to sort by?");
                                 }
                             } while (!validResponse);
@@ -548,6 +548,7 @@ public class Client {
                         }
                         int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase a shoe?");
                         if (purchaseChoice == YES_OPTION) {
+
 
 
                         }
@@ -635,6 +636,32 @@ public class Client {
 //                        JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
                                     INFORMATION_MESSAGE, null, arr, -1);
+                            String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                            boolean validResponse = false;
+                            do {
+                                try {
+                                    Integer.parseInt(quantity);
+                                    validResponse = true;
+                                } catch (NumberFormatException n) {
+                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
+                                    quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                                }
+                            } while (!validResponse);
+                            String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            sellerID = sellerID.trim();
+                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
+
+
+                            String store= input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            store = store.trim();
+                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
+                            System.out.println(store);
+
+                            String wantedShoeName = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            wantedShoeName = wantedShoeName.trim();
+                            System.out.println(wantedShoeName);
+
+
                         }
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)) {
