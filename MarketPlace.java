@@ -856,17 +856,17 @@ public class MarketPlace {
                             case "1":
                                 System.out.println("What is the name of the Store?");
                                 response = scanner.nextLine();
-                                customer.viewMarket(true, response, 1);
+                                System.out.println(customer.viewMarket(true, response, 1));
                                 break;
                             case "2":
                                 System.out.println("What is the name of the Shoe?");
                                 response = scanner.nextLine();
-                                customer.viewMarket(true, response, 2);
+                                System.out.println(customer.viewMarket(true, response, 2));
                                 break;
                             case "3":
                                 System.out.println("What is the description of the Shoe?");
                                 response = scanner.nextLine();
-                                customer.viewMarket(true, response, 3);
+                                System.out.println(customer.viewMarket(true, response, 3));
                                 break;
                             case "4":
                                 boolean validResponse = false;
@@ -881,7 +881,7 @@ public class MarketPlace {
                                         response = scanner.nextLine();
                                     }
                                 } while (!validResponse);
-                                customer.viewMarket(true, response, 4);
+                                System.out.println(customer.viewMarket(true, response, 4));
                                 break;
                             case "5":
                                 validResponse = false;
@@ -896,7 +896,7 @@ public class MarketPlace {
                                         response = scanner.nextLine();
                                     }
                                 } while (!validResponse);
-                                customer.viewMarket(true, response, 5);
+                                System.out.println(customer.viewMarket(true, response, 5));
                                 break;
                             default:
                                 System.out.println(INVALID_VALUE);
