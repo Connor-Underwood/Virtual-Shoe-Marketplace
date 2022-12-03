@@ -452,7 +452,7 @@ public class Seller {
     }
 
 
-    public void viewStatistics(boolean sort, int sortBy) {
+    public synchronized String viewStatistics(boolean sort, int sortBy) {
 
         // would you like to sort --> would you like to sort by
         // Customer1 == 50
@@ -473,20 +473,24 @@ public class Seller {
                 }
                 customers.sort(Comparator.comparingInt(Customer::getTotalAmount));
                 if (customers.size() != 0) {
+                    String s = "";
                     for (int i = customers.size() - 1; i >= 0; i--) {
-                        System.out.println(customers.get(i).getEmail() + ": " + customers.get(i).getTotalAmount() + " Purchases Made.");
+                        s += customers.get(i).getEmail() + ": " + customers.get(i).getTotalAmount() + " Purchases Made." + "\n";
                     }
+                    return s;
                 } else {
-                    System.out.println("You have no customers from any of your stores.");
+                    return "You have no customers from any of your stores.";
                 }
             } else {
                 stores.sort(Comparator.comparingInt(Store::getSales));
                 if (stores.size() != 0) {
+                    String s = "";
                     for (int i = stores.size() - 1; i >= 0; i--) {
-                        System.out.println(stores.get(i).getName() + ": " + stores.get(i).getSales() + " Sales Made.");
+                        s += stores.get(i).getName() + ": " + stores.get(i).getSales() + " Sales Made." + "\n";
                     }
+                    return s;
                 } else {
-                    System.out.println("You have no stores yet.");
+                    return "You have no stores yet.";
                 }
             }
         } else {
@@ -494,84 +498,86 @@ public class Seller {
             // items that they have purchased and a list of products with the number of sales.
             // Store 1:
             // Customer 1: 50 sales --> product1, product2, product3
+            String s = "";
             for (int i = 0; i < stores.size(); i++) {
-                System.out.println("Store " + (i + 1) + ": " + stores.get(i).getName() + " --> Sales: " + stores.get(i).getSales());
+                s += "Store " + (i + 1) + ": " + stores.get(i).getName() + " --> Sales: " + stores.get(i).getSales() + "\n";
                 for (int j = 0; j < stores.get(i).getCustomers().size(); j++) {
-                    System.out.println("Customer " + (j + 1) + ": " + stores.get(i).getCustomers().get(j).getEmail());
+                    s += "Customer " + (j + 1) + ": " + stores.get(i).getCustomers().get(j).getEmail() + "\n";
                     for (int k = 0; k < stores.get(i).getCustomers().get(j).getPurchaseHistory().size(); k++) {
-                        System.out.print("[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n");
+                        s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n";
                     }
                 }
             }
+            return s;
         }
     }
 
-    public void importProducts(String filePath) {
+    public boolean importProducts(String filePath) {
         ArrayList<String> newArrayList = new ArrayList<>();
-        if (filePath.equals(this.email + ".csv")) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-                PrintWriter writer = new PrintWriter(new FileWriter("market.csv",true));
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            PrintWriter writer = new PrintWriter(new FileWriter("market.csv", true));
 
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    String[] arr = line.split(",");
-                    int index = -1;
-                    for (int i = 0; i < this.getStores().size(); i++) {
-                        if (this.getStores().get(i).getName().equalsIgnoreCase(arr[0])) {
-                            index = i;
-                        }
-                    }
-                    if (index != -1) {
-                        Store store = this.getStores().get(index);
-                        Shoe shoe = new Shoe(store, arr[1], arr[2], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
-                        store.addShoe(shoe);
-                        this.stores.set(index, store);
-                        newArrayList.add(line);
-                    } else {
-                        Store store = new Store(arr[0], this);
-                        Shoe shoe = new Shoe(store, arr[1], arr[2], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
-                        store.addShoe(shoe);
-                        writer.println(this.pin + "," + this.email + "," + this.password + "," + line);
-                        writer.flush();
-                        this.stores.add(store);
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                String[] arr = line.split(",");
+                int index = -1;
+                for (int i = 0; i < this.getStores().size(); i++) {
+                    if (this.getStores().get(i).getName().equalsIgnoreCase(arr[0])) {
+                        index = i;
                     }
                 }
-            } catch (IOException io) {
-                System.out.println("Error writing to the " + this.email + ".csv" + " file.");
-            }
-            ArrayList<String> market = new ArrayList<>();
-            try (BufferedReader reader = new BufferedReader(new FileReader("market.csv"))) {
-
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    for (int i = 0; i < newArrayList.size(); i++) {
-                        String[] arr = line.split(",");
-                        String[] arr1 = newArrayList.get(i).split(",");
-                        if (arr.length > 4) {
-                            if (arr[3].equalsIgnoreCase(arr1[0])) {
-                                line += arr1[1] + "," + arr1[2] + "," + arr1[3] + "," + arr1[4] + ",";
-                            }
-                        }
-                    }
-                    market.add(line);
-                }
-            } catch (IOException io) {
-                System.out.println("Error reading to the market.csv file.");
-            }
-            try (PrintWriter writer = new PrintWriter(new FileWriter("market.csv"))) {
-                for (String line : market) {
-                    writer.println(line);
+                if (index != -1) {
+                    Store store = this.getStores().get(index);
+                    Shoe shoe = new Shoe(store, arr[1], arr[2], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                    store.addShoe(shoe);
+                    this.stores.set(index, store);
+                    newArrayList.add(line);
+                } else {
+                    Store store = new Store(arr[0], this);
+                    Shoe shoe = new Shoe(store, arr[1], arr[2], Double.parseDouble(arr[3]), Integer.parseInt(arr[4]));
+                    store.addShoe(shoe);
+                    writer.println(this.pin + "," + this.email + "," + this.password + "," + line);
                     writer.flush();
+                    this.stores.add(store);
                 }
-            } catch (IOException io) {
-                System.out.println("Error writing to the market.csv file");
             }
-        } else {
-            System.out.println("Cannot import products from a different seller!");
+        } catch (IOException io) {
+//                System.out.println("Error writing to the " + this.email + ".csv" + " file.");
+            return false;
+        }
+        ArrayList<String> market = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("market.csv"))) {
+
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                for (int i = 0; i < newArrayList.size(); i++) {
+                    String[] arr = line.split(",");
+                    String[] arr1 = newArrayList.get(i).split(",");
+                    if (arr.length > 4) {
+                        if (arr[3].equalsIgnoreCase(arr1[0])) {
+                            line += arr1[1] + "," + arr1[2] + "," + arr1[3] + "," + arr1[4] + ",";
+                        }
+                    }
+                }
+                market.add(line);
+            }
+        } catch (IOException io) {
+//            System.out.println("Error reading to the market.csv file.");
+            return false;
+        }
+        try (PrintWriter writer = new PrintWriter(new FileWriter("market.csv"))) {
+            for (String line : market) {
+                writer.println(line);
+                writer.flush();
+            }
+            return true;
+        } catch (IOException io) {
+//            System.out.println("Error writing to the market.csv file");
+            return false;
         }
     }
 
-    public void exportProducts(String fileName) {
+    public boolean exportProducts(String fileName) {
         File f = new File(fileName);
         try {
             boolean v = f.createNewFile();
@@ -601,8 +607,10 @@ public class Seller {
                     }
                 }
             }
+            return true;
         } catch (IOException e) {
-            System.out.println("Error writing to the " + fileName +  " file");
+//            System.out.println("Error writing to the " + fileName + " file");
+            return false;
         }
     }
 }
