@@ -46,8 +46,10 @@ class Server {
         private Socket clientSocket;
         private BufferedReader reader;
         private PrintWriter writer;
-        private ObjectInputStream ois;
+
         private ObjectOutputStream oos;
+
+        private ObjectInputStream ois;
 
         // Constructor
         public ClientHandler(Socket socket) throws IOException {
@@ -55,8 +57,9 @@ class Server {
             this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.writer = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
             clientHandlers.add(this);
-            this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
             this.ois = new ObjectInputStream(clientSocket.getInputStream());
+            this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
+
         }
 
         public void run() {
@@ -166,7 +169,7 @@ class Server {
                     }
                     String performAnotherActivity = "";
                     do {
-                        String sellerSelectedOption = reader.readLine(); // RECEIVES SELECTED OPTION FROM THE CLIENT END
+                        String sellerSelectedOption = reader.readLine(); // RECIEVES SELECTED OPTION FROM THE CLIENT END
 
                         if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
                             String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
@@ -182,7 +185,7 @@ class Server {
                             }
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
-                            String storeName = reader.readLine(); // RECEIVES STORENAME FROM CLIENT
+                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
                             int storeIndex = -1;
                             synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
                                 for (int i = 0; i < seller.getStores().size(); i++) {  // SHOULD WE SYNCHRONIZE THIS??????
@@ -331,64 +334,10 @@ class Server {
                     }
                     String performAnotherActivity = "";
                     String customerChosenOption = reader.readLine();
-                    if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)) {
-                        ArrayList<ArrayList<String>> marketList = new ArrayList<>();
-                        ArrayList<String> shoeInTheMarket = new ArrayList<>();
-                        for (Seller seller: MarketPlace.sellers) {
-                            for (Store store: seller.getStores()) {
-                                for (Shoe shoe: store.getShoes()) {
-                                    shoeInTheMarket = new ArrayList<>();
-                                    shoeInTheMarket.add(seller.getEmail());
-                                    shoeInTheMarket.add(shoe.getStore().getName());
-                                    shoeInTheMarket.add(shoe.getName());
-                                    shoeInTheMarket.add(String.valueOf(shoe.getPrice()));
-                                }
-                                marketList.add(shoeInTheMarket);
-                            }
-                        }
-                        for (int i = 0; i <= marketList.size(); i++) {
-                            if (i == marketList.size()) {
-                                writer.println("done writing");
-                            } else {
-                                writer.println("continue");
-                                for (int j = 0; j <= 4; j++) {
-                                    if (j == 4) {
-                                        writer.println("done");
-                                    } else {
-                                        writer.println(marketList.get(i).get(j));
-                                    }
-                                }
-                            }
-                        }
-
+                    if(customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)){
+                        //TODO
                     } else if(customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
-                        String searchChoice = reader.readLine();
-                        if(searchChoice.equalsIgnoreCase("Search by store name.")){
-                            String store = reader.readLine();
-                            String retun = customer.viewMarket(true, store, 1);
-                            oos.writeObject(retun);
-                            oos.flush();
-                        } else if(searchChoice.equalsIgnoreCase("Search by Shoe Name.")){
-                            String store = reader.readLine();
-                            String retun = customer.viewMarket(true, store, 2);
-                            oos.writeObject(retun);
-                            oos.flush();
-                        } else if(searchChoice.equalsIgnoreCase("Search by Shoe Description.")){
-                            String store = reader.readLine();
-                            String retun = customer.viewMarket(true, store, 3);
-                            oos.writeObject(retun);
-                            oos.flush();
-                        } else if(searchChoice.equalsIgnoreCase("Sort by price.")){
-                            String store = reader.readLine();
-                            String retun = customer.viewMarket(true, store, 4);
-                            oos.writeObject(retun);
-                            oos.flush();
-                        } else if(searchChoice.equalsIgnoreCase("Sort by quantity")){
-                            String store = reader.readLine();
-                            String retun = customer.viewMarket(true, store, 5);
-                            oos.writeObject(retun);
-                            oos.flush();
-                        }
+                        //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)){
                         synchronized (GATEKEEPER) {
                             writer.println(customer.viewPurchaseHistory(false));
@@ -400,17 +349,9 @@ class Server {
                             MarketPlace.customers.set(index, customer);
                         }
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        String newEmail = reader.readLine();
-                        synchronized (GATEKEEPER) {
-                            customer.setEmail(newEmail);
-                            MarketPlace.customers.set(index, customer);
-                        }
+                        //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
-                        String newPass = reader.readLine();
-                        synchronized (GATEKEEPER){
-                            customer.setPassword(newPass);
-                            MarketPlace.customers.set(index, customer);
-                        }
+                        //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                         //TODO
                     } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)){
