@@ -632,36 +632,47 @@ public class Client {
                             }
                             String[] strings = new String[s.size()];
                             String[] arr = s.toArray(strings);
-//                        JTable table = new JTable(rows, cols);
-//                        JOptionPane.showMessageDialog(null, new JScrollPane(table));
+//
                             String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
                                     INFORMATION_MESSAGE, null, arr, -1);
+                            String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            sellerID = sellerID.trim();
+                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
+                            writer.println(sellerID);
+
+                            String store= input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            store = store.trim();
+                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
+                            writer.println(store);
+
+                            String wantedShoeName = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                            wantedShoeName = wantedShoeName.trim();
+                            writer.println(wantedShoeName);
+
+                            String shoeInfo = (String) ois.readObject();
+                            JOptionPane.showMessageDialog(null, shoeInfo);
                             String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
                             boolean validResponse = false;
                             do {
                                 try {
                                     Integer.parseInt(quantity);
-                                    validResponse = true;
+                                    if (Integer.parseInt(quantity) < 1) {
+                                        JOptionPane.showMessageDialog(null, "Invalid Value.");
+                                    } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(":")[5].trim())) {
+                                        JOptionPane.showMessageDialog(null, "Sorry, we do not have that many pairs on stock");
+                                    } else {
+                                        validResponse = true;
+                                    }
+
                                 } catch (NumberFormatException n) {
                                     JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
-                                    quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                                }
+                                if(!validResponse) {
+                                    quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase?");
                                 }
                             } while (!validResponse);
-                            String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
-                            sellerID = sellerID.trim();
-                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
-
-
-                            String store= input.substring(input.indexOf(":") + 1,input.indexOf("|"));
-                            store = store.trim();
-                            input = input.substring(input.indexOf("|") + 1,input.length()-1);
-                            System.out.println(store);
-
-                            String wantedShoeName = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
-                            wantedShoeName = wantedShoeName.trim();
-                            System.out.println(wantedShoeName);
-
-
+                            writer.println(quantity);
+                            JOptionPane.showMessageDialog(null, reader.readLine());
                         }
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)) {
