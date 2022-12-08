@@ -304,11 +304,13 @@ public class Seller {
                     try (BufferedReader reader = new BufferedReader(new FileReader("market.csv"))) {
                         String line = "";
                         while ((line = reader.readLine()) != null) { // read from current market.csv
-                            if (line.startsWith(this.pin) && line.contains(store.getName())) { // find Store object we want
-                                // to add to
-                                line += shoe.getName() + "," + shoe.getDescription() + "," + shoe.getPrice() + ","
-                                        + shoe.getQuantity() + ",";
-                                // adding shoe fields to line
+                            if (line.split(",").length > 3) {
+                                if (line.startsWith(this.pin) && line.split(",")[3].contains(store.getName())) { // find Store object we want
+                                    // to add to
+                                    line += shoe.getName() + "," + shoe.getDescription() + "," + shoe.getPrice() + ","
+                                            + shoe.getQuantity() + ",";
+                                    // adding shoe fields to line
+                                }
                             }
                             updatedMarket.add(line); // this ArrayList should have all lines including the one
                             // we modificed
@@ -379,24 +381,26 @@ public class Seller {
                     try (BufferedReader reader = new BufferedReader(new FileReader("market.csv"))) {
                         String line = "";
                         while ((line = reader.readLine()) != null) {
-                            if (line.startsWith(this.pin) && line.toLowerCase().contains(store.getName().toLowerCase())
-                                    && line.toLowerCase().contains(shoe.getName().toLowerCase())) {
-                                String[] lineArray = line.split(",");
-                                Store sto = new Store(lineArray[3], this);
-                                for (int i = 4; i < lineArray.length; i += 4) {
-                                    Shoe shoo = new Shoe(sto, lineArray[i], lineArray[i + 1], Double.parseDouble(lineArray[i + 2]),
-                                            Integer.parseInt(lineArray[i + 3]));
-                                    sto.addShoe(shoo);
-                                }
-                                for (Shoe shoeObj : sto.getShoes()) {
-                                    if (shoeObj.equalsShoe(shoe)) {
-                                        sto.removeShoe(shoeObj);
-                                        line = this.pin + "," + this.email + "," + this.password + "," + sto.getName() + ",";
-                                        for (int i = 0; i < sto.getShoes().size(); i++) {
-                                            line += sto.getShoes().get(i).getName() + "," + sto.getShoes().get(i).getDescription() + ","
-                                                    + sto.getShoes().get(i).getPrice() + "," + sto.getShoes().get(i).getQuantity() + ",";
+                            if (line.split(",").length > 3) {
+                                if (line.startsWith(this.pin) && line.split(",")[3].toLowerCase().contains(store.getName().toLowerCase())
+                                        && line.toLowerCase().contains(shoe.getName().toLowerCase())) {
+                                    String[] lineArray = line.split(",");
+                                    Store sto = new Store(lineArray[3], this);
+                                    for (int i = 4; i < lineArray.length; i += 4) {
+                                        Shoe shoo = new Shoe(sto, lineArray[i], lineArray[i + 1], Double.parseDouble(lineArray[i + 2]),
+                                                Integer.parseInt(lineArray[i + 3]));
+                                        sto.addShoe(shoo);
+                                    }
+                                    for (Shoe shoeObj : sto.getShoes()) {
+                                        if (shoeObj.equalsShoe(shoe)) {
+                                            sto.removeShoe(shoeObj);
+                                            line = this.pin + "," + this.email + "," + this.password + "," + sto.getName() + ",";
+                                            for (int i = 0; i < sto.getShoes().size(); i++) {
+                                                line += sto.getShoes().get(i).getName() + "," + sto.getShoes().get(i).getDescription() + ","
+                                                        + sto.getShoes().get(i).getPrice() + "," + sto.getShoes().get(i).getQuantity() + ",";
+                                            }
+                                            break;
                                         }
-                                        break;
                                     }
                                 }
                             }
@@ -465,17 +469,24 @@ public class Seller {
         // product1,product2,product3
         // Store 2 == 25 sales
         if (sort) {
-            ArrayList<Integer> customerSales = new ArrayList<>();
             ArrayList<Customer> customers = new ArrayList<>();
             if (sortBy == 1) {
                 for (int i = 0; i < stores.size(); i++) {
                     customers.addAll(stores.get(i).getCustomers());
                 }
-                customers.sort(Comparator.comparingInt(Customer::getTotalAmount));
-                if (customers.size() != 0) {
+                ArrayList<Customer> newList = new ArrayList<>();
+                for (Customer customer : customers) {
+                    if (!newList.contains(customer)) {
+                        newList.add(customer);
+                    }
+                }
+                newList.sort(Comparator.comparingInt(Customer::getTotalAmount));
+                if (newList.size() != 0) {
                     String s = "";
-                    for (int i = customers.size() - 1; i >= 0; i--) {
-                        s += customers.get(i).getEmail() + ": " + customers.get(i).getTotalAmount() + " Purchases Made." + "\n";
+                    int count = 1;
+                    for (int i = newList.size() - 1; i >= 0; i--) {
+                        s += newList.get(i).getEmail() + " -- " + newList.get(i).getTotalAmount() + " Purchases Made." + "\n";
+                        count++;
                     }
                     return s;
                 } else {
@@ -500,11 +511,23 @@ public class Seller {
             // Customer 1: 50 sales --> product1, product2, product3
             String s = "";
             for (int i = 0; i < stores.size(); i++) {
-                s += "Store " + (i + 1) + ": " + stores.get(i).getName() + " --> Sales: " + stores.get(i).getSales() + "\n";
-                for (int j = 0; j < stores.get(i).getCustomers().size(); j++) {
-                    s += "Customer " + (j + 1) + ": " + stores.get(i).getCustomers().get(j).getEmail() + "\n";
-                    for (int k = 0; k < stores.get(i).getCustomers().get(j).getPurchaseHistory().size(); k++) {
-                        s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n";
+                s += "Store " + (i + 1) + ": " + stores.get(i).getName() + " -- Total Sales: " + stores.get(i).getSales() + "\n";
+                if (stores.get(i).getCustomers().size() != 0) {
+                    for (int j = 0; j < stores.get(i).getCustomers().size(); j++) {
+                        s += "Customer " + (j + 1) + ": " + stores.get(i).getCustomers().get(j).getEmail() + "\n";
+                        for (int k = 0; k < stores.get(i).getCustomers().get(j).getPurchaseHistory().size(); k++) {
+                            if (k == stores.get(i).getCustomers().get(j).getPurchaseHistory().size() -1 && i != stores.size() -1) {
+                                s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n----------\n";
+                            } else {
+                                s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n";
+                            }
+                        }
+                    }
+                } else {
+                    if (i != stores.size() -1 ) {
+                        s += "No Customers Yet!\n----------\n";
+                    } else {
+                        s += "No Customers Yet!";
                     }
                 }
             }
