@@ -156,14 +156,14 @@ public class Customer {
         this.password = newPassword;
     }
 
-    public String viewPurchaseHistory(boolean export) {
+    public String viewPurchaseHistory(boolean export, String filePath) {
         if (export) {
-            File f = new File(this.email + ".txt");
+            File f = new File(filePath);
             if (f.exists()) {
                 if (purchaseHistory.size() == 0) {
                     return "You have no shoes in your purchase history.";
                 } else {
-                    try (PrintWriter writer = new PrintWriter(new FileWriter(this.email + ".txt"))) {
+                    try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
                         writer.println("Total Shoes Purchased: " + totalAmountPurchased);
                         writer.flush();
                         for (int i = 0; i < purchaseHistory.size(); i++) {
@@ -189,7 +189,7 @@ public class Customer {
             if (purchaseHistory.size() == 0) {
                 return "You have no shoes in your purchase history.";
             } else {
-                String history = "Total Shoes Purchased: " + totalAmountPurchased;
+                String history = "Total Shoes Purchased: " + totalAmountPurchased + "\n";
                 for (int i = 0; i < purchaseHistory.size(); i++) {
                     history += "Shoe: " + purchaseHistory.get(i).getName() + "\n";
                     history += "Price: " + purchaseHistory.get(i).getPrice() + "\n";
@@ -408,6 +408,9 @@ public class Customer {
             }
         }
     } // use to search and view the market in market.csv
+
+
+
 
 
     /**
