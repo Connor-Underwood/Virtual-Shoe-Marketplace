@@ -182,6 +182,14 @@ class Server {
                             }
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
+                            for (int i = 0; i < seller.getStores().size(); i++) {
+                                writer.println(seller.getStores().get(i).getName());
+                                if (i == seller.getStores().size() -1) {
+                                    writer.println("Done");
+                                } else {
+                                    writer.println("YOO");
+                                }
+                            }
                             String storeName = reader.readLine(); // RECEIVES STORENAME FROM CLIENT
                             int storeIndex = -1;
                             synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
@@ -213,6 +221,14 @@ class Server {
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Remove a shoe")) {
                             String shoeName = reader.readLine();
+                            for (int i =0; i < seller.getStores().size(); i++) {
+                                writer.println(seller.getStores().get(i).getName());
+                                if (i != seller.getStores().size() -1) {
+                                    writer.println("YOO");
+                                } else {
+                                    writer.println("Done");
+                                }
+                            }
                             String storeName = reader.readLine();
                             int storeIndex = -1;
                             synchronized (GATEKEEPER) { // CHECKS IF STORE IS OWNED BY SELLER
@@ -299,6 +315,7 @@ class Server {
                         if (sellerSelectedOption.equalsIgnoreCase("View your sales information")) {
                             String option = reader.readLine();
                             if (option.startsWith("c")) {
+                                System.out.println(seller.viewStatistics(true, 1));
                                 oos.writeObject(seller.viewStatistics(true, 1));
                                 oos.flush();
                             } else if (option.startsWith("s")) {
@@ -417,28 +434,32 @@ class Server {
                         }
                         else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
                             synchronized (GATEKEEPER) {
-                                writer.println(customer.viewPurchaseHistory(false));
+                                oos.writeObject(customer.viewPurchaseHistory(false, ""));
                                 MarketPlace.customers.set(index, customer);
                             }
                         }
                         else if (customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
+                            String filePath = reader.readLine();
                             synchronized (GATEKEEPER) {
-                                writer.println(customer.viewPurchaseHistory(true));
+                                writer.println(customer.viewPurchaseHistory(true, filePath));
                                 MarketPlace.customers.set(index, customer);
                             }
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
                             String newEmail = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setEmail(newEmail);
                                 MarketPlace.customers.set(index, customer);
                             }
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
                             String newPass = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setPassword(newPass);
                                 MarketPlace.customers.set(index, customer);
                             }
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                             ArrayList<ArrayList<String>> marketList = new ArrayList<>();
                             ArrayList<String> shoeInTheMarket = new ArrayList<>();
                             for (Seller seller : MarketPlace.sellers) {
@@ -501,11 +522,9 @@ class Server {
                         } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)) {
                             String option = reader.readLine();
                             if (option.equals("No")) {
-                                System.out.println(MarketPlace.viewStoreStatistics(false, -1, ""));
                                 oos.writeObject(MarketPlace.viewStoreStatistics(false, -1, ""));
                                 oos.flush();
                             } else if (option.equals("Sort by number of products sold in every store")) {
-                                System.out.println(MarketPlace.viewStoreStatistics(true, 1, ""));
                                 oos.writeObject(MarketPlace.viewStoreStatistics(true, 1, ""));
                                 oos.flush();
                             } else {
