@@ -184,7 +184,7 @@ public class Client {
 
                     // ADD STORE
                     if (chosenOption.equalsIgnoreCase("Add a store")) {
-                        storeName = JOptionPane.showInputDialog(null, "What is the name of" +
+                        storeName = JOptionPane.showInputDialog(null, "What is the name of " +
                                 "the store you would like to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                         writer.println(storeName); // SENDS STORENAME TO THE SERVER
                         String addStoreResult = reader.readLine(); // USED TO CHECK IF STORE IS ADDED
@@ -199,24 +199,34 @@ public class Client {
 
                     // ADD SHOE
                     if (chosenOption.equalsIgnoreCase("Add a New Shoe")) {
-                        storeName = JOptionPane.showInputDialog(null, "Which store would you like to add" +
-                                " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        ArrayList<String> storeNames = new ArrayList<>();
+                        String s = "";
+                        while ((s = reader.readLine()) != null) {
+                            storeNames.add(s);
+                            if (reader.readLine().equalsIgnoreCase("Done")) {
+                                break;
+                            }
+                        }
+                        String[] size = new String[storeNames.size()];
+                        String[] stores = storeNames.toArray(size);
+                        storeName = (String) JOptionPane.showInputDialog(null, "Which store would you like to add" +
+                                " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null, stores, -1);
                         writer.println(storeName); // WE HAVE A PROBLEM HERE (SENDS STORENAME TO THE SERVER)
                         String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
                         if (storeIndex.equals("-1")) {
                             JOptionPane.showMessageDialog(null, "You do not own this store!",
                                     "Happy Feet", JOptionPane.ERROR_MESSAGE);
                         } else {
-                            shoeName = JOptionPane.showInputDialog(null, "What is the name of the" +
+                            shoeName = JOptionPane.showInputDialog(null, "What is the name of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeName);
-                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the description of the" +
+                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the description of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeDesc);
-                            double price = Double.parseDouble(JOptionPane.showInputDialog(null, "What is the price of the" +
+                            double price = Double.parseDouble(JOptionPane.showInputDialog(null, "What is the price of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
                             writer.println(price);
-                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the" +
+                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
                             writer.println(quantity);
                             String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS ADDED TO THE STORE
@@ -227,6 +237,7 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, "Shoe could not be added :(",
                                         "Happy Feet", JOptionPane.ERROR_MESSAGE);
                             }
+
                         }
                     }
 
@@ -234,9 +245,19 @@ public class Client {
                     if (chosenOption.equalsIgnoreCase("Remove a Shoe")) {
                         shoeName = JOptionPane.showInputDialog(null,
                                 "What is the name of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
-                        writer.println(shoeName); // WE HAVE A PROBLEM HERE (SENDS SHOENAME TO SERVER)
-                        storeName = JOptionPane.showInputDialog(null,
-                                "What is the name of the store you would like to remove the shoe from?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                        writer.println(shoeName);
+                        ArrayList<String> stores = new ArrayList<>();
+                        String s = "";
+                        while ((s = reader.readLine()) != null) {
+                            stores.add(s);
+                            if (reader.readLine().equalsIgnoreCase("Done")) {
+                                break;
+                            }
+                        }
+                        String[] size = new String[stores.size()];
+                        String[] storeArray = stores.toArray(size);
+                        storeName = (String)JOptionPane.showInputDialog(null,
+                                "What store would you like to remove the Shoe from?", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null, storeArray, -1);
                         writer.println(storeName);
                         String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
                         if (storeIndex.equals("-1")) {
@@ -469,7 +490,6 @@ public class Client {
                             Object[][] rows = new Object[marketList.size()][4];
                             for (int i = 0; i < marketList.size(); i++) {
                                 for (int j = 0; j < marketList.get(i).size(); j++) {
-                                    System.out.println(marketList.get(i).get(j)); // debug
                                     rows[i][j] = marketList.get(i).get(j);
                                 }
                             }
@@ -523,7 +543,6 @@ public class Client {
                                     Double.parseDouble(price);
                                     validResponse = true;
                                 } catch (NumberFormatException n) {
-                                    System.out.println(MarketPlace.INVALID_VALUE);
                                     price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
                                 }
                             } while (!validResponse);
@@ -549,12 +568,10 @@ public class Client {
                         int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase a shoe?");
                         if (purchaseChoice == YES_OPTION) {
 
-
-
                         }
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
-                        String result = reader.readLine();
+                        String result = (String) ois.readObject();
                         if (result.startsWith("Total")) {
                             JOptionPane.showMessageDialog(null, result);
                         } else {
@@ -562,6 +579,8 @@ public class Client {
                         }
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
+                        String input = JOptionPane.showInputDialog(null, "What is the name of the file you like to see your purchase history in?");
+                        writer.println(input);
                         String result = reader.readLine();
                         if (result.startsWith("Total")) {
                             JOptionPane.showMessageDialog(null, result);
@@ -589,7 +608,6 @@ public class Client {
                         writer.println(newPass);
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
-                        Object[] cols = {"Seller ID", "Store Name", "Shoe Name", "Shoe Price"};
                         ArrayList<ArrayList<String>> marketList = new ArrayList<>();
                         ArrayList<String> shoe = new ArrayList<>();
                         String response;
@@ -606,14 +624,6 @@ public class Client {
                             JOptionPane.showMessageDialog(null, "No shoes in the market!",
                                     "Happy Feet", ERROR_MESSAGE);
                         } else {
-                            Object[][] rows = new Object[marketList.size()][4];
-                            for (int i = 0; i < marketList.size(); i++) {
-                                for (int j = 0; j < marketList.get(i).size(); j++) {
-                                    System.out.println(marketList.get(i).get(j)); // debug
-                                    rows[i][j] = marketList.get(i).get(j);
-                                }
-                            }
-
                             ArrayList<String> s = new ArrayList<>();
                             for (int i = 0; i < marketList.size(); i++) {
                                 String string = "";
@@ -625,7 +635,7 @@ public class Client {
                                     } else if (j == 2) {
                                         string += "Shoe Name: " + marketList.get(i).get(j) + " | ";
                                     } else {
-                                        string += "Shoe Price: " + marketList.get(i).get(j);
+                                        string += "Shoe Price: $" + marketList.get(i).get(j);
                                     }
                                 }
                                 s.add(string);
@@ -688,8 +698,8 @@ public class Client {
                                 String result = (String) ois.readObject();
                                 JOptionPane.showMessageDialog(null, result);
                             } else {
-                                String result = (String) ois.readObject();
                                 writer.println("Sort by number of products sold in stores you have purchased from");
+                                String result = (String) ois.readObject();
                                 JOptionPane.showMessageDialog(null, result);
                             }
                         } else {
