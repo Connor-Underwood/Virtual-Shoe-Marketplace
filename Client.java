@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
 
@@ -363,18 +362,16 @@ public class Client {
                                     writer.println("");
                                 }
                                 String valid = reader.readLine();
+                                int num;
                                 if (valid.equals("Y")) {
-                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Successfully Edited!",
+                                    num = JOptionPane.showConfirmDialog(null, "Shoe Successfully Edited!",
                                             "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
-                                    if (num == CLOSED_OPTION) {
-                                        return;
-                                    }
                                 } else {
-                                    int num = JOptionPane.showConfirmDialog(null, "Shoe Could Not Be Edited",
+                                    num = JOptionPane.showConfirmDialog(null, "Shoe Could Not Be Edited",
                                             "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
-                                    if (num == CLOSED_OPTION) {
-                                        return;
-                                    }
+                                }
+                                if (num == CLOSED_OPTION) {
+                                    return;
                                 }
                             }
                         }
@@ -426,7 +423,7 @@ public class Client {
                         writer.println(input);
                         String success = reader.readLine();
                         if (success.equalsIgnoreCase("true")) {
-                            JOptionPane.showMessageDialog(null, "Your products have been sucessfully " +
+                            JOptionPane.showMessageDialog(null, "Your products have been successfully " +
                                     "imported to the Market!");
                         } else {
                             JOptionPane.showMessageDialog(null, "Unable to import your products to " +
@@ -482,7 +479,6 @@ public class Client {
                             shoe = new ArrayList<>();
                         }
 
-
                         if (marketList.size() == 0) {
                             JOptionPane.showMessageDialog(null, "No shoes in the market!",
                                     "Happy Feet", ERROR_MESSAGE);
@@ -493,62 +489,135 @@ public class Client {
                                     rows[i][j] = marketList.get(i).get(j);
                                 }
                             }
-
-                            ArrayList<String> s = new ArrayList<>();
-                            for (int i = 0; i < marketList.size(); i++) {
-                                String string = "";
-                                for (int j = 0; j < marketList.get(i).size(); j++) {
-                                    if (j == 0) {
-                                        string += "Seller ID: " + marketList.get(i).get(j) + " | ";
-                                    } else if (j == 1) {
-                                        string += "Store Name: " + marketList.get(i).get(j) + " | ";
-                                    } else if (j == 2) {
-                                        string += "Shoe Name: " + marketList.get(i).get(j) + " | ";
-                                    } else {
-                                        string += "Shoe Price: " + marketList.get(i).get(j);
-                                    }
-                                }
-                                s.add(string);
-                            }
-
                             JTable table = new JTable(rows, cols);
                             JOptionPane.showMessageDialog(null, new JScrollPane(table));
-
                         }
                     }
+//                            ArrayList<String> s = new ArrayList<>();
+//                            for (int i = 0; i < marketList.size(); i++) {
+//                                String string = "";
+//                                for (int j = 0; j < marketList.get(i).size(); j++) {
+//                                    if (j == 0) {
+//                                        string += "Seller ID: " + marketList.get(i).get(j) + " | ";
+//                                    } else if (j == 1) {
+//                                        string += "Store Name: " + marketList.get(i).get(j) + " | ";
+//                                    } else if (j == 2) {
+//                                        string += "Shoe Name: " + marketList.get(i).get(j) + " | ";
+//                                    } else {
+//                                        string += "Shoe Price: " + marketList.get(i).get(j);
+//                                    }
+//                                }
+//                                s.add(string);
+
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
+                        ArrayList<ArrayList<String>> marketList = new ArrayList<>();
+                        ArrayList<String> shoe = new ArrayList<>();
+                        String response;
+                        Object[] cols = {"Seller ID", "Store Name", "Shoe Name", "Shoe Price"};
                         String[] viewOptions = {"Search by Store Name.", "Search by Shoe Name.", "Search by Shoe Description.", "Sort by Price.", "Sort by Quantity"};
                         String searchChoice = (String) JOptionPane.showInputDialog(null, "Select an Option", "Happy Feet", INFORMATION_MESSAGE, null, viewOptions, 0);
                         writer.println(searchChoice);
                         if (searchChoice.equalsIgnoreCase("Search by Store Name.")) {
                             String store = JOptionPane.showInputDialog(null, "What is the name of the store?");
                             writer.println(store);
-                            String result = (String) ois.readObject();
-                            JOptionPane.showMessageDialog(null, result);
+                            while (!(reader.readLine().equals("done writing"))) {
+                                while (!((response = reader.readLine())).equals("done")) {
+                                    shoe.add(response);
+                                }
+                                marketList.add(shoe);
+                                shoe = new ArrayList<>();
+                            }
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                Object[][] rows = new Object[marketList.size()][4];
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        rows[i][j] = marketList.get(i).get(j);
+                                    }
+                                }
+                                JTable table = new JTable(rows, cols);
+                                JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                            }
                         } else if (searchChoice.equalsIgnoreCase("Search by Shoe Name.")) {
-                            String store = JOptionPane.showInputDialog(null, "What is the name of the shoe?");
-                            writer.println(store);
-                            String result = (String) ois.readObject();
-                            JOptionPane.showMessageDialog(null, result);
+                            String name = JOptionPane.showInputDialog(null, "What is the name of the shoe?");
+                            writer.println(name);
+                            while (!(reader.readLine().equals("done writing"))) {
+                                while (!((response = reader.readLine())).equals("done")) {
+                                    shoe.add(response);
+                                }
+                                marketList.add(shoe);
+                                shoe = new ArrayList<>();
+                            }
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                Object[][] rows = new Object[marketList.size()][4];
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        rows[i][j] = marketList.get(i).get(j);
+                                    }
+                                }
+                                JTable table = new JTable(rows, cols);
+                                JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                            }
                         } else if (searchChoice.equalsIgnoreCase("Search by Shoe Description.")) {
-                            String store = JOptionPane.showInputDialog(null, "What is the description of the shoe?");
-                            writer.println(store);
-                            String result = (String) ois.readObject();
-                            JOptionPane.showMessageDialog(null, result);
+                            String Description = JOptionPane.showInputDialog(null, "What is the description of the shoe?");
+                            writer.println(Description);
+                            while (!(reader.readLine().equals("done writing"))) {
+                                while (!((response = reader.readLine())).equals("done")) {
+                                    shoe.add(response);
+                                }
+                                marketList.add(shoe);
+                                shoe = new ArrayList<>();
+                            }
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                Object[][] rows = new Object[marketList.size()][4];
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        rows[i][j] = marketList.get(i).get(j);
+                                    }
+                                }
+                                JTable table = new JTable(rows, cols);
+                                JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                            }
                         } else if (searchChoice.equalsIgnoreCase("Sort by price.")) {
-                            String price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
+                            String Price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
                             boolean validResponse = false;
                             do {
                                 try {
-                                    Double.parseDouble(price);
+                                    Double.parseDouble(Price);
                                     validResponse = true;
                                 } catch (NumberFormatException n) {
-                                    price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
+                                    Price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
                                 }
                             } while (!validResponse);
-                            writer.println(price);
-                            String result = (String) ois.readObject();
-                            JOptionPane.showMessageDialog(null, result);
+                            writer.println(Price);
+                            while (!(reader.readLine().equals("done writing"))) {
+                                while (!((response = reader.readLine())).equals("done")) {
+                                    shoe.add(response);
+                                }
+                                marketList.add(shoe);
+                                shoe = new ArrayList<>();
+                            }
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                Object[][] rows = new Object[marketList.size()][4];
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        rows[i][j] = marketList.get(i).get(j);
+                                    }
+                                }
+                                JTable table = new JTable(rows, cols);
+                                JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                            }
                         } else if (searchChoice.equalsIgnoreCase("sort by quantity")) {
                             String quantity = JOptionPane.showInputDialog(null, "What is quantity you want to sort by?");
                             boolean validResponse = false;
@@ -562,12 +631,93 @@ public class Client {
                                 }
                             } while (!validResponse);
                             writer.println(quantity);
-                            String result = (String) ois.readObject();
-                            JOptionPane.showMessageDialog(null, result);
+                            while (!(reader.readLine().equals("done writing"))) {
+                                while (!((response = reader.readLine())).equals("done")) {
+                                    shoe.add(response);
+                                }
+                                marketList.add(shoe);
+                                shoe = new ArrayList<>();
+                            }
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                Object[][] rows = new Object[marketList.size()][4];
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        rows[i][j] = marketList.get(i).get(j);
+                                    }
+                                }
+                                JTable table = new JTable(rows, cols);
+                                JOptionPane.showMessageDialog(null, new JScrollPane(table));
+                            }
                         }
-                        int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase a shoe?");
+                        int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase any of those shoes?");
                         if (purchaseChoice == YES_OPTION) {
+                            writer.println("wants to purchase");
+                            if (marketList.size() == 0) {
+                                JOptionPane.showMessageDialog(null, "No shoes in the market!",
+                                        "Happy Feet", ERROR_MESSAGE);
+                            } else {
+                                ArrayList<String> s = new ArrayList<>();
+                                for (int i = 0; i < marketList.size(); i++) {
+                                    String string = "";
+                                    for (int j = 0; j < marketList.get(i).size(); j++) {
+                                        if (j == 0) {
+                                            string += "Seller ID: " + marketList.get(i).get(j) + " | ";
+                                        } else if (j == 1) {
+                                            string += "Store Name: " + marketList.get(i).get(j) + " | ";
+                                        } else if (j == 2) {
+                                            string += "Shoe Name: " + marketList.get(i).get(j) + " | ";
+                                        } else {
+                                            string += "Shoe Price: $" + marketList.get(i).get(j);
+                                        }
+                                    }
+                                    s.add(string);
+                                }
+                                String[] strings = new String[s.size()];
+                                String[] arr = s.toArray(strings);
+                                String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
+                                        INFORMATION_MESSAGE, null, arr, -1);
+                                String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                                sellerID = sellerID.trim();
+                                input = input.substring(input.indexOf("|") + 1,input.length()-1);
+                                writer.println(sellerID);
 
+                                String store= input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                                store = store.trim();
+                                input = input.substring(input.indexOf("|") + 1,input.length()-1);
+                                writer.println(store);
+
+                                String wantedShoeName = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
+                                wantedShoeName = wantedShoeName.trim();
+                                writer.println(wantedShoeName);
+
+                                String shoeInfo = (String) ois.readObject();
+                                JOptionPane.showMessageDialog(null, shoeInfo);
+                                String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                                boolean validResponse = false;
+                                do {
+                                    try {
+                                        Integer.parseInt(quantity);
+                                        if (Integer.parseInt(quantity) < 1) {
+                                            JOptionPane.showMessageDialog(null, "Invalid Value.");
+                                        } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(":")[5].trim())) {
+                                            JOptionPane.showMessageDialog(null, "Sorry, we do not have that many pairs on stock");
+                                        } else {
+                                            validResponse = true;
+                                        }
+
+                                    } catch (NumberFormatException n) {
+                                        JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
+                                    }
+                                    if(!validResponse) {
+                                        quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase?");
+                                    }
+                                } while (!validResponse);
+                                writer.println(quantity);
+                                JOptionPane.showMessageDialog(null, reader.readLine());
+                            }
                         }
                     }
                     else if (chosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
@@ -642,7 +792,7 @@ public class Client {
                             }
                             String[] strings = new String[s.size()];
                             String[] arr = s.toArray(strings);
-//
+
                             String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
                                     INFORMATION_MESSAGE, null, arr, -1);
                             String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
@@ -716,13 +866,8 @@ public class Client {
 
             }
 
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-
-            // establish a connection by providing host and port
-            // number
         }
     }
 }
