@@ -165,12 +165,12 @@ class Server {
                         }
                         seller = MarketPlace.sellers.get(index); // GETS SPECIFIC SELLER
                     }
-                    String performAnotherActivity = "";
+                    String performAnotherActivity;
                     do {
                         String sellerSelectedOption = reader.readLine(); // RECEIVES SELECTED OPTION FROM THE CLIENT END
 
                         if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
-                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
+                            String storeName = reader.readLine(); // RECEIVES STORENAME FROM CLIENT
                             Store tempStore;
                             synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
                                 tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
@@ -370,13 +370,13 @@ class Server {
                         }
                         customer = MarketPlace.customers.get(index); // GETS SPECIFIC SELLER
                     }
-                    String performAnotherActivity = "";
+                    String performAnotherActivity;
 
                     do  {
                         String customerChosenOption = reader.readLine();
                         if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET)) {
                             ArrayList<ArrayList<String>> marketList = new ArrayList<>();
-                            ArrayList<String> shoeInTheMarket = new ArrayList<>();
+                            ArrayList<String> shoeInTheMarket;
                             for (Seller seller : MarketPlace.sellers) {
                                 for (Store store : seller.getStores()) {
                                     for (Shoe shoe : store.getShoes()) {
@@ -403,8 +403,42 @@ class Server {
                                     }
                                 }
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
+                            String purchase = reader.readLine();
+                            if (purchase.equalsIgnoreCase("wants to purchase")) {
+                                String sellerEmail = reader.readLine();
+                                String storeName = reader.readLine();
+                                String shoeName = reader.readLine();
+                                int sellerIndex = -1;
+                                for (int i = 0; i < MarketPlace.sellers.size(); i++) {
+                                    if (MarketPlace.sellers.get(i).getEmail().equalsIgnoreCase(sellerEmail)) {
+                                        sellerIndex = i;
+                                        break;
+                                    }
+                                }
+                                Seller seller = MarketPlace.sellers.get(sellerIndex);
+                                int storeIndex = -1;
+                                for (int i = 0; i < seller.getStores().size(); i++) {
+                                    if (seller.getStores().get(i).getName().equalsIgnoreCase(storeName)) {
+                                        storeIndex = i;
+                                        break;
+                                    }
+                                }
+                                Store store = MarketPlace.sellers.get(sellerIndex).getStores().get(storeIndex);
+                                Shoe shoe;
+                                synchronized (GATEKEEPER) {
+                                    shoe = customer.findShoe(shoeName, storeName);
+                                    oos.writeObject("Store: " + shoe.getStore().getName() + "\n" + "Name: " + shoe.getName() + "\n" +
+                                            "Description: " + shoe.getDescription() + "\n" + "Price: " + shoe.getPrice() + "\n" +
+                                            "Quantity: " + shoe.getQuantity());
+                                }
+                                String quantity = reader.readLine();
+                                synchronized (GATEKEEPER) {
+                                    customer.purchase(shoe, store, Integer.parseInt(quantity));
+                                    writer.println(shoe.getName() + " successfully purchased!");
+                                }
+                            }
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
                             String searchChoice = reader.readLine();
                             ArrayList<ArrayList<String>> marketList;
                             if (searchChoice.equalsIgnoreCase("Search by store name.")) {
@@ -505,7 +539,7 @@ class Server {
                                 }
                             } else if (searchChoice.equalsIgnoreCase("Sort by price.")) {
                                 String userChoicePrice = reader.readLine();
-                                Double price = Double.parseDouble(userChoicePrice);
+                                double price = Double.parseDouble(userChoicePrice);
                                 marketList = new ArrayList<>();
                                 ArrayList<String> shoeInTheMarket = new ArrayList<>();
                                 for(Seller seller: MarketPlace.sellers) {
@@ -604,37 +638,37 @@ class Server {
                                     writer.println(shoe.getName() + " successfully purchased!");
                                 }
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
                             synchronized (GATEKEEPER) {
                                 oos.writeObject(customer.viewPurchaseHistory(false));
                                 MarketPlace.customers.set(index, customer);
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
                             String filePath = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 writer.println(customer.viewPurchaseHistory(true));
                                 MarketPlace.customers.set(index, customer);
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
                             String newEmail = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setEmail(newEmail);
                                 MarketPlace.customers.set(index, customer);
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
                             String newPass = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setPassword(newPass);
                                 MarketPlace.customers.set(index, customer);
                             }
-                        }
-                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
+
+                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                             ArrayList<ArrayList<String>> marketList = new ArrayList<>();
-                            ArrayList<String> shoeInTheMarket = new ArrayList<>();
+                            ArrayList<String> shoeInTheMarket;
                             for (Seller seller : MarketPlace.sellers) {
                                 for (Store store : seller.getStores()) {
                                     for (Shoe shoe : store.getShoes()) {
@@ -692,6 +726,7 @@ class Server {
                                 customer.purchase(shoe, store, Integer.parseInt(quantity));
                                 writer.println(shoe.getName() + " successfully purchased!");
                             }
+
                         } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)) {
                             String option = reader.readLine();
                             if (option.equals("No")) {
@@ -709,14 +744,11 @@ class Server {
                     } while (performAnotherActivity.equals("0"));
 
                 }
-
-
             } catch (IOException io) {
                 JOptionPane.showMessageDialog(null, "Error running ClientHandler.");
             }
         }
     }
-
 
     public static void main(String[] args) {
         try {
