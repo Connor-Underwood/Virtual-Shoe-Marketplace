@@ -30,7 +30,8 @@ public class Client {
 
             String[] welcomePage = {"Login", "Create An Account"}; // Welcomes the Client presents drop down menu
             // to login or create account
-            String sellerOrCustomer = (String) JOptionPane.showInputDialog(null, "Welcome To Happy Feet!",
+            String sellerOrCustomer = (String) JOptionPane.showInputDialog(null, "Welcome " +
+                            "To Happy Feet!",
                     "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, welcomePage, null);
 
 
@@ -39,7 +40,8 @@ public class Client {
             String userType = ""; // userType, Customer or Seller
             if (sellerOrCustomer.equals("Login")) {
                 writer.println("Login"); // Let Server know Client is trying to log in
-                email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy " +
+                        "Feet", JOptionPane.QUESTION_MESSAGE);
                 if (email == null) { // If click exit, email will be null, which means we exit program
                     return;
                 }
@@ -55,7 +57,8 @@ public class Client {
                     }
 
                     // Get new E-Mail
-                    email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                    email = JOptionPane.showInputDialog(null, "Enter Your E-Mail", "Happy " +
+                            "Feet", JOptionPane.QUESTION_MESSAGE);
                     if (email == null) {
                         return;
                     }
@@ -63,7 +66,8 @@ public class Client {
                 }
                 // At this point, the user has entered a valid E-Mail
                 // Now we start the password verification below
-                password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy" +
+                        " Feet", JOptionPane.QUESTION_MESSAGE);
                 if (password == null) { // Check if exit button, then exit the program
                     return;
                 }
@@ -78,7 +82,8 @@ public class Client {
                         return;
                     }
                     // Get new Password
-                    password = JOptionPane.showInputDialog(null, "Enter Your Password", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                    password = JOptionPane.showInputDialog(null, "Enter Your Password",
+                            "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                     if (password == null) { // If they exit, close program
                         return;
                     }
@@ -95,7 +100,8 @@ public class Client {
                     return;
                 }
                 while (!email.contains("@")) { // A loop to make sure the E-Mail contains an @ character
-                    int num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy Feet",
+                    int num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy" +
+                                    " Feet",
                             JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (num == JOptionPane.CLOSED_OPTION) {
                         return;
@@ -107,7 +113,8 @@ public class Client {
                 }
                 writer.println(email); // Send to Server for taken E-Mail verification
                 while (reader.readLine().equals("Taken")) { // If taken, run a loop until the E-Mail is valid and unique
-                    int num = JOptionPane.showConfirmDialog(null, "This E-Mail is Already Taken", "Happy Feet", JOptionPane.DEFAULT_OPTION,
+                    int num = JOptionPane.showConfirmDialog(null, "This E-Mail is Already Taken"
+                            , "Happy Feet", JOptionPane.DEFAULT_OPTION,
                             JOptionPane.PLAIN_MESSAGE);
                     if (num == JOptionPane.CLOSED_OPTION) { // If Client exits, close program
                         return;
@@ -118,7 +125,8 @@ public class Client {
                         return;
                     }
                     while (!email.contains("@")) { // Have to check again for the @ character, run a loop
-                        num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy Feet",
+                        num = JOptionPane.showConfirmDialog(null, "Invalid E-Mail", "Happy" +
+                                        " Feet",
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
                         if (num == JOptionPane.CLOSED_OPTION) {
                             return;
@@ -133,17 +141,20 @@ public class Client {
                 }
 
                 // Receive Password from Client Input
-                password = JOptionPane.showInputDialog(null, "Please Enter A Password Greater Than 5 Characters");
+                password = JOptionPane.showInputDialog(null, "Please Enter A Password Greater" +
+                        " Than 5 Characters");
                 if (password == null) { // If they exit, close program
                     return;
                 }
                 while (password.length() < 5) { // Make sure password is greater than 5 characters inside a loop
-                    int num = JOptionPane.showConfirmDialog(null, "Password Must Be Greater Than 5 Characters", "Happy Feet",
+                    int num = JOptionPane.showConfirmDialog(null, "Password Must Be Greater " +
+                                    "Than 5 Characters", "Happy Feet",
                             JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (num == JOptionPane.CLOSED_OPTION) { // If they exit, close program
                         return;
                     }
-                    password = JOptionPane.showInputDialog(null, "Please Enter A Password Greater Than 5 Characters");
+                    password = JOptionPane.showInputDialog(null, "Please Enter A Password " +
+                            "Greater Than 5 Characters");
                     if (password == null) { // If they exit close program
                         return;
                     }
@@ -175,7 +186,8 @@ public class Client {
 
                 // PRESENTS SELLER MENU
                 do {
-                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
+                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select" +
+                                    " an Option",
                             "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, sellerMenuOptions, 0);
 
                     // SENDS THE CHOSEN OPTION TO THE SERVER
@@ -208,24 +220,41 @@ public class Client {
                         }
                         String[] size = new String[storeNames.size()];
                         String[] stores = storeNames.toArray(size);
-                        storeName = (String) JOptionPane.showInputDialog(null, "Which store would you like to add" +
+                        storeName = (String) JOptionPane.showInputDialog(null, "Which store " +
+                                "would you like to add" +
                                 " the shoe to:", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null, stores, -1);
                         writer.println(storeName); // WE HAVE A PROBLEM HERE (SENDS STORENAME TO THE SERVER)
-                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK
+                        // IF STORE EXISTS
                         if (storeIndex.equals("-1")) {
                             JOptionPane.showMessageDialog(null, "You do not own this store!",
                                     "Happy Feet", JOptionPane.ERROR_MESSAGE);
                         } else {
-                            shoeName = JOptionPane.showInputDialog(null, "What is the name of the " +
+                            shoeName = JOptionPane.showInputDialog(null, "What is the name of " +
+                                    "the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeName);
-                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the description of the " +
+                            String shoeDesc = JOptionPane.showInputDialog(null, "What is the " +
+                                    "description of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeDesc);
-                            double price = Double.parseDouble(JOptionPane.showInputDialog(null, "What is the price of the " +
-                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
+                            String price = JOptionPane.showInputDialog(null,
+                                    "What is the price of the " +
+                                    "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            if (price.contains(".")) {
+                                int index = price.indexOf(".");
+                                while (price.substring(index + 1).length() > 2) {
+                                    JOptionPane.showMessageDialog(null, "Invalid");
+                                    price = JOptionPane.showInputDialog(null,
+                                            "What is the price of the " +
+                                                    "shoe you wish to add:", "Happy Feet", 
+                                            JOptionPane.QUESTION_MESSAGE);
+                                    index = price.indexOf(".");
+                                }
+                            }
                             writer.println(price);
-                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null, "What is the quantity of the " +
+                            int quantity = Integer.parseInt(JOptionPane.showInputDialog(null,
+                                    "What is the quantity of the " +
                                     "shoe you wish to add:", "Happy Feet", JOptionPane.QUESTION_MESSAGE));
                             writer.println(quantity);
                             String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS ADDED TO THE STORE
@@ -243,7 +272,8 @@ public class Client {
                     // REMOVE SHOE
                     if (chosenOption.equalsIgnoreCase("Remove a Shoe")) {
                         shoeName = JOptionPane.showInputDialog(null,
-                                "What is the name of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                                "What is the name of the shoe you would like to remove?", "Happy Feet",
+                                JOptionPane.QUESTION_MESSAGE);
                         writer.println(shoeName);
                         ArrayList<String> stores = new ArrayList<>();
                         String s = "";
@@ -256,28 +286,37 @@ public class Client {
                         String[] size = new String[stores.size()];
                         String[] storeArray = stores.toArray(size);
                         storeName = (String)JOptionPane.showInputDialog(null,
-                                "What store would you like to remove the Shoe from?", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null, storeArray, -1);
+                                "What store would you like to remove the Shoe from?", "Happy Feet",
+                                JOptionPane.QUESTION_MESSAGE, null, storeArray, -1);
                         writer.println(storeName);
-                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF STORE EXISTS
+                        String storeIndex = reader.readLine(); //GETS THE STORE INDEX, FROM THE SERVER TO CHECK IF
+                        // STORE EXISTS
                         if (storeIndex.equals("-1")) {
                             JOptionPane.showMessageDialog(null, "You do not own this store!",
                                     "Happy Feet", JOptionPane.ERROR_MESSAGE);
                         } else {
-                            String shoeDescription = JOptionPane.showInputDialog(null, "What is the " +
-                                    "description of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                            String shoeDescription = JOptionPane.showInputDialog(null, "What " +
+                                    "is the " +
+                                    "description of the shoe you would like to remove?", "Happy Feet",
+                                    JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeDescription);
                             String shoePrice = JOptionPane.showInputDialog(null, "What is the " +
-                                    "price of the shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
+                                    "price of the shoe you would like to remove?", "Happy Feet",
+                                    JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoePrice);
-                            String shoeQuantity = JOptionPane.showInputDialog(null, "What is the quantity of the " +
+                            String shoeQuantity = JOptionPane.showInputDialog(null,
+                                    "What is the quantity of the " +
                                     "shoe you would like to remove?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                             writer.println(shoeQuantity);
-                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS REMOVED FROM THE STORE
+                            String addShoeResult = reader.readLine(); // USED TO CHECK IF SHOE WAS REMOVED FROM THE
+                            // STORE
                             if (addShoeResult.equalsIgnoreCase("Shoe Removed!")) {
                                 JOptionPane.showMessageDialog(null, "Shoe removed successfully!",
                                         "Happy Feet", JOptionPane.PLAIN_MESSAGE);
-                            } else if (addShoeResult.equalsIgnoreCase(storeName + " does not own " + shoeName + "'s!")) {
-                                JOptionPane.showMessageDialog(null, storeName + " does not own " + shoeName + "'s!",
+                            } else if (addShoeResult.equalsIgnoreCase(storeName + " does not own " +
+                                    shoeName + "'s!")) {
+                                JOptionPane.showMessageDialog(null, storeName + " does not own "
+                                                + shoeName + "'s!",
                                         "Happy Feet", JOptionPane.ERROR_MESSAGE);
                             }
                         }
@@ -285,15 +324,18 @@ public class Client {
 
                     // EDIT SHOE
                     if (chosenOption.equalsIgnoreCase("Edit a Shoe")) {
-                        shoeName = JOptionPane.showInputDialog(null, "What shoe do you want to edit",
+                        shoeName = JOptionPane.showInputDialog(null, "What shoe do you want " +
+                                        "to edit",
                                 "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                         writer.println(shoeName);
-                        storeName = JOptionPane.showInputDialog(null, "What store does the shoe " +
+                        storeName = JOptionPane.showInputDialog(null, "What store does the " +
+                                "shoe " +
                                 "belong to?", "Happy Feet", JOptionPane.QUESTION_MESSAGE);
                         writer.println(storeName);
                         String storeIndex = reader.readLine();
                         if (storeIndex.equals("-1")) {
-                            int num = JOptionPane.showConfirmDialog(null, "You do not own this store!", "Happy Feet",
+                            int num = JOptionPane.showConfirmDialog(null, "You do not own " +
+                                            "this store!", "Happy Feet",
                                     JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
                             if (num == CLOSED_OPTION) {
                                 return;
@@ -301,60 +343,76 @@ public class Client {
                         } else {
                             String shoeIndex = reader.readLine();
                             if (shoeIndex.equals("-1")) {
-                                int num = JOptionPane.showConfirmDialog(null, storeName + " does not own this shoe!", "Happy Feet",
+                                int num = JOptionPane.showConfirmDialog(null, storeName + " " +
+                                                "does not own this shoe!", "Happy Feet",
                                         JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
                                 if (num == CLOSED_OPTION) {
                                     return;
                                 }
                             } else {
-                                int choice = JOptionPane.showConfirmDialog(null, "Do you want to change the name of the Shoe?",
+                                int choice = JOptionPane.showConfirmDialog(null, "Do you want" +
+                                                " to change the name of the Shoe?",
                                         "Happy Feet", JOptionPane.YES_NO_OPTION);
                                 if (choice == YES_OPTION) {
                                     writer.println("Change Shoe Name");
-                                    shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                    shoeName = JOptionPane.showInputDialog(null, "What do you" +
+                                            " want the name of the shoe to be?");
                                     while (shoeName == null) {
-                                        shoeName = JOptionPane.showInputDialog(null, "What do you want the name of the shoe to be?");
+                                        shoeName = JOptionPane.showInputDialog(null, "What do " +
+                                                "you want the name of the shoe to be?");
                                     }
                                     writer.println(shoeName);
                                 } else {
                                     writer.println("");
                                 }
-                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to " +
+                                        "change " +
                                         "the description of the Shoe?", "Happy Feet", YES_NO_OPTION);
                                 if (choice == YES_OPTION) {
                                     writer.println("Change Shoe Description");
-                                    String shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                    String shoeDescription = JOptionPane.showInputDialog(null,
+                                            "What do you want the " +
                                             "description of the Shoe to be?");
                                     while (shoeDescription == null) {
-                                        shoeDescription = JOptionPane.showInputDialog(null, "What do you want the " +
+                                        shoeDescription = JOptionPane.showInputDialog(null,
+                                                "What do you want the " +
                                                 "description of the Shoe to be?");
                                     }
                                     writer.println(shoeDescription);
                                 } else {
                                     writer.println("");
                                 }
-                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change " +
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to " +
+                                        "change " +
                                         "the price of the Shoe?", "Happy Feet", YES_NO_OPTION);
                                 if (choice == YES_OPTION) {
                                     writer.println("Change Shoe Price");
-                                    String shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
+                                    String shoePrice = JOptionPane.showInputDialog(null, "What " +
+                                            "do you want the " +
                                             "price of the Shoe to be?");
-                                    while (shoePrice == null) {
-                                        shoePrice = JOptionPane.showInputDialog(null, "What do you want the " +
-                                                "price of the Shoe to be?");
+                                    if (shoePrice.contains(".")) {
+                                        int index = shoePrice.indexOf(".");
+                                    while (shoePrice == null || shoePrice.substring(index + 1).length() > 2) {
+                                        shoePrice = JOptionPane.showInputDialog(null, "What " +
+                                                "do you want the " +
+                                                "price of the Shoe to be? (2 Decimal Places)");
+                                        }
                                     }
                                     writer.println(shoePrice);
                                 } else {
                                     writer.println("");
                                 }
-                                choice = JOptionPane.showConfirmDialog(null, "Do you want to change the " +
+                                choice = JOptionPane.showConfirmDialog(null, "Do you want to " +
+                                        "change the " +
                                         "quantity of the Shoe?", "Happy Feet", YES_NO_OPTION);
                                 if (choice == YES_OPTION) {
                                     writer.println("Change Shoe Quantity");
-                                    String shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                    String shoeQuantity = JOptionPane.showInputDialog(null, "" +
+                                            "What do you want " +
                                             "the quantity of the Shoe to be?");
                                     while (shoeQuantity == null) {
-                                        shoeQuantity = JOptionPane.showInputDialog(null, "What do you want " +
+                                        shoeQuantity = JOptionPane.showInputDialog(null, "What " +
+                                                "do you want " +
                                                 "the quantity of the Shoe to be?");
                                     }
                                     writer.println(shoeQuantity);
@@ -364,10 +422,12 @@ public class Client {
                                 String valid = reader.readLine();
                                 int num;
                                 if (valid.equals("Y")) {
-                                    num = JOptionPane.showConfirmDialog(null, "Shoe Successfully Edited!",
+                                    num = JOptionPane.showConfirmDialog(null, "Shoe " +
+                                                    "Successfully Edited!",
                                             "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
                                 } else {
-                                    num = JOptionPane.showConfirmDialog(null, "Shoe Could Not Be Edited",
+                                    num = JOptionPane.showConfirmDialog(null, "Shoe Could Not " +
+                                                    "Be Edited",
                                             "Happy Feet", DEFAULT_OPTION, PLAIN_MESSAGE);
                                 }
                                 if (num == CLOSED_OPTION) {
@@ -380,7 +440,8 @@ public class Client {
                     // VIEW SALES
                     if (chosenOption.equalsIgnoreCase("View your sales information")) {
                         String[] arr = {"Sort by Customer Sales", "Sort by Store Sales", "No Filters"};
-                        String option = (String)JOptionPane.showInputDialog(null, "Sort the DashBoard", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null,
+                        String option = (String)JOptionPane.showInputDialog(null, "Sort " +
+                                        "the DashBoard", "Happy Feet", JOptionPane.QUESTION_MESSAGE, null,
                                 arr, -1);
                         if (option.equalsIgnoreCase("no filters")) {
                             writer.println("none");
@@ -398,9 +459,11 @@ public class Client {
                     }
                     // CHANGE E-MAIL
                     if (chosenOption.equalsIgnoreCase("Change Email")) {
-                        String newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        String newEmail = JOptionPane.showInputDialog(null, "Enter your " +
+                                "new Email:");
                         while (!MarketPlace.checkEmail(newEmail)) {
-                            newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                            newEmail = JOptionPane.showInputDialog(null, "Enter your " +
+                                    "new Email:");
                         }
                         writer.println(newEmail);
                     }
@@ -408,9 +471,11 @@ public class Client {
                     if (chosenOption.equalsIgnoreCase("Change Password")) {
                         String newPass;
                         while (true) {
-                            newPass = JOptionPane.showInputDialog(null, "What do you want your new password to be?");
+                            newPass = JOptionPane.showInputDialog(null, "What do you " +
+                                    "want your new password to be?");
                             if (newPass.length() < 5) {
-                                JOptionPane.showMessageDialog(null, "Password must be greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null, "Password must be " +
+                                        "greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
                                 continue;
                             }
                             break;
@@ -423,28 +488,34 @@ public class Client {
                         writer.println(input);
                         String success = reader.readLine();
                         if (success.equalsIgnoreCase("true")) {
-                            JOptionPane.showMessageDialog(null, "Your products have been successfully " +
+                            JOptionPane.showMessageDialog(null, "Your products have been " +
+                                    "successfully " +
                                     "imported to the Market!");
                         } else {
-                            JOptionPane.showMessageDialog(null, "Unable to import your products to " +
+                            JOptionPane.showMessageDialog(null, "Unable to import your" +
+                                    " products to " +
                                     "the market.");
                         }
                     }
 
                     if (chosenOption.equalsIgnoreCase("Export products to a file")) {
-                        String input = JOptionPane.showInputDialog(null, "Enter the name of the file you would " +
+                        String input = JOptionPane.showInputDialog(null, "Enter the name " +
+                                "of the file you would " +
                                 "like to see your products in.");
                         writer.println(input);
                         String success = reader.readLine();
                         if (success.equalsIgnoreCase("true")) {
-                            JOptionPane.showMessageDialog(null, "Your products have been successfully exported to " + input);
+                            JOptionPane.showMessageDialog(null, "Your products have been " +
+                                    "successfully exported to " + input);
                         } else {
-                            JOptionPane.showMessageDialog(null, "Unable to export products to File Name: " + input);
+                            JOptionPane.showMessageDialog(null, "Unable to export products" +
+                                    " to File Name: " + input);
                         }
                     }
 
                     performAnotherActivity = JOptionPane.showConfirmDialog(null,
-                            "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION);
+                            "Would you like to perform another activity", "Happy Feet",
+                            JOptionPane.YES_NO_OPTION);
                     writer.println(performAnotherActivity);
                 } while (performAnotherActivity == YES_OPTION);  //LOOPS OVER SELLER MENU AGAIN IF CLIENT SELECTS YES
 
@@ -456,13 +527,18 @@ public class Client {
                         JOptionPane.PLAIN_MESSAGE);
 
                 int performAnotherActivity;
-                String[] customerMenuOptions = {MarketPlace.VIEW_MARKET, MarketPlace.SEARCH_MARKET, MarketPlace.REVIEW_PURCHASE_HISTORY, MarketPlace.EXPORT_SHOE, MarketPlace.CHANGE_CUSTOMER_EMAIL, MarketPlace.CHANGE_CUSTOMER_PASSWORD, MarketPlace.PURCHASE_SHOE, MarketPlace.VIEW_MARKET_STATISTICS};
+                String[] customerMenuOptions = {MarketPlace.VIEW_MARKET, MarketPlace.SEARCH_MARKET,
+                        MarketPlace.REVIEW_PURCHASE_HISTORY, MarketPlace.EXPORT_SHOE,
+                        MarketPlace.CHANGE_CUSTOMER_EMAIL, MarketPlace.CHANGE_CUSTOMER_PASSWORD,
+                        MarketPlace.PURCHASE_SHOE, MarketPlace.VIEW_MARKET_STATISTICS};
 
                 // PRESENTS CUSTOMER MENU
 
                 do {
-                    String chosenOption = (String) JOptionPane.showInputDialog(null, "Select an Option",
-                            "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, customerMenuOptions, 0);
+                    String chosenOption = (String) JOptionPane.showInputDialog(null,
+                            "Select an Option",
+                            "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null,
+                            customerMenuOptions, 0);
 
                     // SENDS THE CHOSEN OPTION TO THE SERVER
                     writer.println(chosenOption);
@@ -492,7 +568,8 @@ public class Client {
                             JTable table = new JTable(rows, cols);
                             JOptionPane.showMessageDialog(null, new JScrollPane(table));
                         }
-                        int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase any of those shoes?");
+                        int purchaseChoice = JOptionPane.showConfirmDialog(null,
+                                "Do you want to purchase any of those shoes?");
                         if (purchaseChoice == YES_OPTION) {
                             writer.println("wants to purchase");
                             if (marketList.size() == 0) {
@@ -517,7 +594,8 @@ public class Client {
                                 }
                                 String[] strings = new String[s.size()];
                                 String[] arr = s.toArray(strings);
-                                String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
+                                String input = (String) JOptionPane.showInputDialog(null,
+                                        "Purchase a shoe.", "Happy Feet",
                                         INFORMATION_MESSAGE, null, arr, -1);
                                 String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
                                 sellerID = sellerID.trim();
@@ -535,24 +613,29 @@ public class Client {
 
                                 String shoeInfo = (String) ois.readObject();
                                 JOptionPane.showMessageDialog(null, shoeInfo);
-                                String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                                String quantity = JOptionPane.showInputDialog(null, "How many " +
+                                        "pairs would you like to purchase");
                                 boolean validResponse = false;
                                 do {
                                     try {
                                         Integer.parseInt(quantity);
                                         if (Integer.parseInt(quantity) < 1) {
                                             JOptionPane.showMessageDialog(null, "Invalid Value.");
-                                        } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(":")[5].trim())) {
-                                            JOptionPane.showMessageDialog(null, "Sorry, we do not have that many pairs on stock");
+                                        } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(
+                                                ":")[5].trim())) {
+                                            JOptionPane.showMessageDialog(null, "Sorry, " +
+                                                    "we do not have that many pairs on stock");
                                         } else {
                                             validResponse = true;
                                         }
 
                                     } catch (NumberFormatException n) {
-                                        JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
+                                        JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE,
+                                                "Happy Feet", ERROR_MESSAGE);
                                     }
                                     if(!validResponse) {
-                                        quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase?");
+                                        quantity = JOptionPane.showInputDialog(null, "How many " +
+                                                "pairs would you like to purchase?");
                                     }
                                 } while (!validResponse);
                                 writer.println(quantity);
@@ -565,11 +648,15 @@ public class Client {
                         ArrayList<String> shoe = new ArrayList<>();
                         String response;
                         Object[] cols = {"Seller ID", "Store Name", "Shoe Name", "Shoe Price"};
-                        String[] viewOptions = {"Search by Store Name.", "Search by Shoe Name.", "Search by Shoe Description.", "Sort by Price.", "Sort by Quantity"};
-                        String searchChoice = (String) JOptionPane.showInputDialog(null, "Select an Option", "Happy Feet", INFORMATION_MESSAGE, null, viewOptions, 0);
+                        String[] viewOptions = {"Search by Store Name.", "Search by Shoe Name.", "Search by Shoe" +
+                                " Description.", "Sort by Price.", "Sort by Quantity"};
+                        String searchChoice = (String) JOptionPane.showInputDialog(null, "Se" +
+                                "lect an Option", "Happy Feet", INFORMATION_MESSAGE, null, viewOptions,
+                                0);
                         writer.println(searchChoice);
                         if (searchChoice.equalsIgnoreCase("Search by Store Name.")) {
-                            String store = JOptionPane.showInputDialog(null, "What is the name of the store?");
+                            String store = JOptionPane.showInputDialog(null, "What is the " +
+                                    "name of the store?");
                             writer.println(store);
                             while (!(reader.readLine().equals("done writing"))) {
                                 while (!((response = reader.readLine())).equals("done")) {
@@ -592,7 +679,8 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             }
                         } else if (searchChoice.equalsIgnoreCase("Search by Shoe Name.")) {
-                            String name = JOptionPane.showInputDialog(null, "What is the name of the shoe?");
+                            String name = JOptionPane.showInputDialog(null, "What is the " +
+                                    "name of the shoe?");
                             writer.println(name);
                             while (!(reader.readLine().equals("done writing"))) {
                                 while (!((response = reader.readLine())).equals("done")) {
@@ -615,7 +703,8 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             }
                         } else if (searchChoice.equalsIgnoreCase("Search by Shoe Description.")) {
-                            String Description = JOptionPane.showInputDialog(null, "What is the description of the shoe?");
+                            String Description = JOptionPane.showInputDialog(null, "What is" +
+                                    " the description of the shoe?");
                             writer.println(Description);
                             while (!(reader.readLine().equals("done writing"))) {
                                 while (!((response = reader.readLine())).equals("done")) {
@@ -638,14 +727,16 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             }
                         } else if (searchChoice.equalsIgnoreCase("Sort by price.")) {
-                            String Price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
+                            String Price = JOptionPane.showInputDialog(null, "What is the " +
+                                    "price you want to sort by?");
                             boolean validResponse = false;
                             do {
                                 try {
                                     Double.parseDouble(Price);
                                     validResponse = true;
                                 } catch (NumberFormatException n) {
-                                    Price = JOptionPane.showInputDialog(null, "What is the price you want to sort by?");
+                                    Price = JOptionPane.showInputDialog(null, "What is the " +
+                                            "price you want to sort by?");
                                 }
                             } while (!validResponse);
                             writer.println(Price);
@@ -670,15 +761,18 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             }
                         } else if (searchChoice.equalsIgnoreCase("sort by quantity")) {
-                            String quantity = JOptionPane.showInputDialog(null, "What is quantity you want to sort by?");
+                            String quantity = JOptionPane.showInputDialog(null, "What is" +
+                                    " quantity you want to sort by?");
                             boolean validResponse = false;
                             do {
                                 try {
                                     Integer.parseInt(quantity);
                                     validResponse = true;
                                 } catch (NumberFormatException n) {
-                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
-                                    quantity = JOptionPane.showInputDialog(null, "What is quantity you want to sort by?");
+                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE,
+                                            "Happy Feet", ERROR_MESSAGE);
+                                    quantity = JOptionPane.showInputDialog(null, "What is" +
+                                            " quantity you want to sort by?");
                                 }
                             } while (!validResponse);
                             writer.println(quantity);
@@ -703,7 +797,8 @@ public class Client {
                                 JOptionPane.showMessageDialog(null, new JScrollPane(table));
                             }
                         }
-                        int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you want to purchase any of those shoes?");
+                        int purchaseChoice = JOptionPane.showConfirmDialog(null, "Do you" +
+                                " want to purchase any of those shoes?");
                         if (purchaseChoice == YES_OPTION) {
                             writer.println("wants to purchase");
                             if (marketList.size() == 0) {
@@ -728,7 +823,8 @@ public class Client {
                                 }
                                 String[] strings = new String[s.size()];
                                 String[] arr = s.toArray(strings);
-                                String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
+                                String input = (String) JOptionPane.showInputDialog(null,
+                                        "Purchase a shoe.", "Happy Feet",
                                         INFORMATION_MESSAGE, null, arr, -1);
                                 String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
                                 sellerID = sellerID.trim();
@@ -746,24 +842,29 @@ public class Client {
 
                                 String shoeInfo = (String) ois.readObject();
                                 JOptionPane.showMessageDialog(null, shoeInfo);
-                                String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                                String quantity = JOptionPane.showInputDialog(null, "How " +
+                                        "many pairs would you like to purchase");
                                 boolean validResponse = false;
                                 do {
                                     try {
                                         Integer.parseInt(quantity);
                                         if (Integer.parseInt(quantity) < 1) {
                                             JOptionPane.showMessageDialog(null, "Invalid Value.");
-                                        } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(":")[5].trim())) {
-                                            JOptionPane.showMessageDialog(null, "Sorry, we do not have that many pairs on stock");
+                                        } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(
+                                                ":")[5].trim())) {
+                                            JOptionPane.showMessageDialog(null, "Sorry, we" +
+                                                    " do not have that many pairs on stock");
                                         } else {
                                             validResponse = true;
                                         }
 
                                     } catch (NumberFormatException n) {
-                                        JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
+                                        JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE,
+                                                "Happy Feet", ERROR_MESSAGE);
                                     }
                                     if(!validResponse) {
-                                        quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase?");
+                                        quantity = JOptionPane.showInputDialog(null, "How" +
+                                                " many pairs would you like to purchase?");
                                     }
                                 } while (!validResponse);
                                 writer.println(quantity);
@@ -780,7 +881,8 @@ public class Client {
                         }
 
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
-                        String input = JOptionPane.showInputDialog(null, "What is the name of the file you like to see your purchase history in?");
+                        String input = JOptionPane.showInputDialog(null, "What is the name " +
+                                "of the file you like to see your purchase history in?");
                         writer.println(input);
                         String result = reader.readLine();
                         if (result.startsWith("Total")) {
@@ -790,18 +892,22 @@ public class Client {
                         }
 
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
-                        String newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                        String newEmail = JOptionPane.showInputDialog(null, "Enter" +
+                                " your new Email:");
                         while (!MarketPlace.checkEmail(newEmail)) {
-                            newEmail = JOptionPane.showInputDialog(null, "Enter your new Email:");
+                            newEmail = JOptionPane.showInputDialog(null, "Enter your n" +
+                                    "ew Email:");
                         }
                         writer.println(newEmail);
 
                     } else if (chosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
                         String newPass;
                         while (true) {
-                            newPass = JOptionPane.showInputDialog(null, "What do you want your new password to be?");
+                            newPass = JOptionPane.showInputDialog(null, "What do you want " +
+                                    "your new password to be?");
                             if (newPass.length() < 5) {
-                                JOptionPane.showMessageDialog(null, "Password must be greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null, "Password must be " +
+                                        "greater than 5 characters!", "Happy Feet", JOptionPane.ERROR_MESSAGE);
                                 continue;
                             }
                             break;
@@ -844,7 +950,8 @@ public class Client {
                             String[] strings = new String[s.size()];
                             String[] arr = s.toArray(strings);
 
-                            String input = (String) JOptionPane.showInputDialog(null, "Purchase a shoe.", "Happy Feet",
+                            String input = (String) JOptionPane.showInputDialog(null, "" +
+                                            "Purchase a shoe.", "Happy Feet",
                                     INFORMATION_MESSAGE, null, arr, -1);
                             String sellerID = input.substring(input.indexOf(":") + 1,input.indexOf("|"));
                             sellerID = sellerID.trim();
@@ -862,24 +969,29 @@ public class Client {
 
                             String shoeInfo = (String) ois.readObject();
                             JOptionPane.showMessageDialog(null, shoeInfo);
-                            String quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase");
+                            String quantity = JOptionPane.showInputDialog(null, "How many" +
+                                    " pairs would you like to purchase");
                             boolean validResponse = false;
                             do {
                                 try {
                                     Integer.parseInt(quantity);
                                     if (Integer.parseInt(quantity) < 1) {
                                         JOptionPane.showMessageDialog(null, "Invalid Value.");
-                                    } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(":")[5].trim())) {
-                                        JOptionPane.showMessageDialog(null, "Sorry, we do not have that many pairs on stock");
+                                    } else if (Integer.parseInt(quantity) > Integer.parseInt(shoeInfo.split(
+                                            ":")[5].trim())) {
+                                        JOptionPane.showMessageDialog(null, "Sorry, we d" +
+                                                "o not have that many pairs on stock");
                                     } else {
                                         validResponse = true;
                                     }
 
                                 } catch (NumberFormatException n) {
-                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE, "Happy Feet", ERROR_MESSAGE);
+                                    JOptionPane.showMessageDialog(null, MarketPlace.INVALID_VALUE,
+                                            "Happy Feet", ERROR_MESSAGE);
                                 }
                                 if(!validResponse) {
-                                    quantity = JOptionPane.showInputDialog(null, "How many pairs would you like to purchase?");
+                                    quantity = JOptionPane.showInputDialog(null, "How many" +
+                                            " pairs would you like to purchase?");
                                 }
                             } while (!validResponse);
                             writer.println(quantity);
@@ -892,8 +1004,10 @@ public class Client {
                         if (sort == YES_OPTION) {
                             String[] options = {"Sort by number of products sold in every store",
                                     "Sort by number of products sold in stores you have purchased from"};
-                            String sortBy = (String) JOptionPane.showInputDialog(null, "Select an Option",
-                                    "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, options, 0);
+                            String sortBy = (String) JOptionPane.showInputDialog(null,
+                                    "Select an Option",
+                                    "Happy Feet", JOptionPane.INFORMATION_MESSAGE, null, options,
+                                    0);
                             if (sortBy.equals("Sort by number of products sold in every store")) {
                                 writer.println("Sort by number of products sold in every store");
                                 String result = (String) ois.readObject();
@@ -910,7 +1024,8 @@ public class Client {
                         }
                     }
                     performAnotherActivity = JOptionPane.showConfirmDialog(null,
-                            "Would you like to perform another activity", "Happy Feet", JOptionPane.YES_NO_OPTION);
+                            "Would you like to perform another activity", "Happy Feet",
+                            JOptionPane.YES_NO_OPTION);
                     writer.println(performAnotherActivity);
                 } while (performAnotherActivity == YES_OPTION);
             }
