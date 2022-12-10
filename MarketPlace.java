@@ -14,7 +14,8 @@ public class MarketPlace {
     public static final String INVALID_VALUE = "Please enter a valid value.";
     private static final String INVALID_EMAIL = "Please enter a valid email (Must contain @).";
     private static final String TAKEN_EMAIL = "This e-mail has already been taken!";
-    private static final String INVALID_PASSWORD = "Please enter a valid password (Must contain more than 5 characters).";
+    private static final String INVALID_PASSWORD = "Please enter a valid password (Must contain more than " +
+            "5 characters).";
     public static final String ACCOUNT_PROMPT = "1: Sign In\n2: Create an account.";
     public static final String ENTER_YOUR_EMAIL = "Please enter your e-mail.";
     public static final String LOGIN_PASSWORD_PROMPT = "Please enter your password.";
@@ -70,7 +71,8 @@ public class MarketPlace {
                             Seller seller = new Seller(cutComma, lineArray[1], lineArray[2]);
                             Store store = new Store(lineArray[3], seller);
                             for (int j = 4; j < lineArray.length; j += 4) {
-                                Shoe shoe = new Shoe(store, lineArray[j], lineArray[j + 1], Double.parseDouble(lineArray[j + 2]),
+                                Shoe shoe = new Shoe(store, lineArray[j], lineArray[j + 1], 
+                                        Double.parseDouble(lineArray[j + 2]),
                                         Integer.parseInt(lineArray[j + 3]));
                                 store.addShoe(shoe);
                             }
@@ -88,7 +90,8 @@ public class MarketPlace {
                             sellers.get(index).addStore(store, false);
                             sellers.set(index, sellers.get(index));
                         }
-                    } else { // if the seller hasn't added a store or product yet. we just initialize their pin, email, and password
+                    } else { // if the seller hasn't added a store or product yet. we just initialize their pin, email,
+                        // and password
                         boolean no = false;
                         int index = sellers.size();
                         for (int j = 0; j < sellers.size(); j++) {
@@ -128,7 +131,8 @@ public class MarketPlace {
         // seller portion of load market
 
         File stores = new File("stores.csv");
-        if (stores.exists()) { // appending store sales and revenue to the specific store and seller in the sellers arrayList
+        if (stores.exists()) { // appending store sales and revenue to the specific store and seller in the sellers 
+            // arrayList
             try (BufferedReader reader = new BufferedReader(new FileReader("stores.csv"))) {
                 /**
                  * DO THIS LATER TONIGHT
@@ -208,7 +212,8 @@ public class MarketPlace {
                             if (storeIndex != -1) {
                                 Store store = sellers.get(sellerIndex).getStores().get(storeIndex);
                                 for (int i = 10; i < arr.length; i += 4) {
-                                    Shoe shoe = new Shoe(store, arr[i], arr[i + 1], Double.parseDouble(arr[i + 2]), Integer.parseInt(arr[i + 3]));
+                                    Shoe shoe = new Shoe(store, arr[i], arr[i + 1], Double.parseDouble(arr[i + 2]), 
+                                            Integer.parseInt(arr[i + 3]));
                                     customer.addPurchaseHistory(shoe);
                                 }
                                 customer.addTotalAmount(Integer.parseInt(arr[9]));
@@ -370,7 +375,8 @@ public class MarketPlace {
                 int count = 1;
                 String s = "";
                 for (int i = stores.size() - 1; i >= 0; i--) {
-                    s += "Store " + (count) + ": " + stores.get(i).getName() + " --> " + stores.get(i).getSales() + " sales." + "\n";
+                    s += "Store " + (count) + ": " + stores.get(i).getName() + " --> " + stores.get(i).getSales() + 
+                            " sales." + "\n";
                     count++;
                 }
                 return s;
@@ -437,17 +443,20 @@ public class MarketPlace {
         if ("1".equals(choice)) {
             System.out.println(ENTER_YOUR_EMAIL);
             email = scanner.nextLine();
-            while (checkEmail(email)) { // if check e-mail is true, then the email they entered is not in the file, so keep asking for a valid email
+            while (checkEmail(email)) { // if check e-mail is true, then the email they entered is not in the file
+                // , so keep asking for a valid email
                 System.out.println(WRONG_EMAIL);
                 email = scanner.nextLine();
             }
             System.out.println(LOGIN_PASSWORD_PROMPT);
             password = scanner.nextLine();
-            while (!checkPassword(email, password)) { // while the password is not in the file, keep asking them to enter a new password
+            while (!checkPassword(email, password)) { // while the password is not in the file, keep asking them to
+                // enter a new password
                 System.out.println(WRONG_PASSWORD);
                 password = scanner.nextLine();
             }
-            System.out.println(LOGIN_SUCCESSFUL); // when the email and password are correct print the login successful prompt.
+            System.out.println(LOGIN_SUCCESSFUL); // when the email and password are correct print the login 
+            // successful prompt.
 
             try (BufferedReader reader = new BufferedReader(new FileReader("accounts.csv"))) {
                 String line = "";
@@ -648,7 +657,8 @@ public class MarketPlace {
                             if (seller.removeShoe(store, shoe, true)) {
                                 sellers.set(index, seller);
                             } else {
-                                System.out.println("Could not remove " + shoe.getName() + " from " + store.getName() + ".");
+                                System.out.println("Could not remove " + shoe.getName() + " from " + store.getName() +
+                                        ".");
                             }
                         }
                         break;
@@ -677,7 +687,8 @@ public class MarketPlace {
                                 System.out.println(store.getName() + " does not own this shoe!");
                             } else {
                                 Shoe shoe = store.getShoes().get(shoeIndex);
-                                seller.removeShoe(store, shoe, true); // lets change this to true if we run into an error
+                                seller.removeShoe(store, shoe, true); // lets change this to true if we run
+                                // into an error
 
                                 String newShoeName = shoe.getName();
                                 String newShoeDescription = shoe.getDescription();
@@ -710,7 +721,8 @@ public class MarketPlace {
                                     newQuantity = scanner.nextInt();
                                     scanner.nextLine();
                                 }
-                                seller.addShoe(store, new Shoe(store, newShoeName, newShoeDescription, newPrice, newQuantity), true);
+                                seller.addShoe(store, new Shoe(store, newShoeName, newShoeDescription, newPrice,
+                                        newQuantity), true);
                                 sellers.set(index, seller);
                             }
                         }
@@ -926,7 +938,8 @@ public class MarketPlace {
                                     }
                                 }
                                 if (storeIndex != -1) {
-                                    Store store = sellers.get(someIndex).getStores().get(storeIndex); // FIND SPECIFIC STORE
+                                    Store store = sellers.get(someIndex).getStores().get(storeIndex); // FIND 
+                                    // SPECIFIC STORE
                                     Shoe shoe = customer.findShoe(shoeName, storeName);
                                     if (shoe != null) {
                                         System.out.println("Store: " + shoe.getStore().getName());
