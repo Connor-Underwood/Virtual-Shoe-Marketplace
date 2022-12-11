@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.Random;
 
 // Server class
@@ -22,7 +21,7 @@ class Server {
                 Thread t = new Thread(clientHandler);
                 t.start();
             }
-        } catch (IOException io) {
+        } catch (Exception e) {
             closeServer();
         }
     }
@@ -32,8 +31,8 @@ class Server {
             if (serverSocket != null) {
                 serverSocket.close();
             }
-        } catch (IOException io) {
-            JOptionPane.showMessageDialog(null, "Error closing server.");
+        } catch (Exception e) {
+            int num;
         }
     }
 
@@ -124,7 +123,7 @@ class Server {
                             writer.println(userPin + "," + email + "," + password + ",");
                             writer.flush();
                         } catch (IOException io) {
-                            System.out.println("Error writing to the accounts.csv file.");
+                            int num;
                         }
                     }
 
@@ -136,7 +135,7 @@ class Server {
                                 writer.println(userPin + "," + email + "," + password + ",");
                                 writer.flush();
                             } catch (IOException io) {
-                                System.out.println("Error writing to the market.csv file.");
+                                int num;
                             }
                             Seller seller = new Seller(Integer.toString(userPin), email, password); // make a new Seller object
                             MarketPlace.sellers.add(seller); // add it to the arrayList of Sellers because they just made an account
@@ -165,21 +164,23 @@ class Server {
                         }
                         seller = MarketPlace.sellers.get(index); // GETS SPECIFIC SELLER
                     }
-                    String performAnotherActivity;
+                    String performAnotherActivity = "";
                     do {
                         String sellerSelectedOption = reader.readLine(); // RECEIVES SELECTED OPTION FROM THE CLIENT END
 
                         if (sellerSelectedOption.equalsIgnoreCase("Add a store")) {
-                            String storeName = reader.readLine(); // RECEIVES STORENAME FROM CLIENT
-                            Store tempStore;
-                            synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
-                                tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
-                                if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
-                                    writer.println("Store added");
-                                } else {
-                                    writer.println("You already own this store!");
+                            String storeName = reader.readLine(); // RECIEVES STORENAME FROM CLIENT
+                            if (!storeName.startsWith("Y")) {
+                                Store tempStore;
+                                synchronized (GATEKEEPER) { // SYNCHRONIZED BECAUSE METHOD CALL INSIDE MODIFIES THE FILES
+                                    tempStore = new Store(storeName, seller); // PLACEHOLDER TO ADD TO THE SELLERS' ARRAYLIST OF STORES
+                                    if (seller.addStore(tempStore, true)) { // CHECKS IF STORE HAS BEEN ADDED SUCCESSFULLY
+                                        writer.println("Store added");
+                                    } else {
+                                        writer.println("You already own this store!");
+                                    }
+                                    MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
                                 }
-                                MarketPlace.sellers.set(index, seller); // RESETS SELLER AFTER MAKING CHANGES
                             }
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Add a New shoe")) {
@@ -283,7 +284,6 @@ class Server {
                                 }
                                 if (shoeIndex != -1) {
                                     Shoe shoe = store.getShoes().get(shoeIndex);
-                                    seller.removeShoe(store, shoe, true);
                                     String newShoeName = shoe.getName();
                                     String newShoeDescription = shoe.getDescription();
                                     String newPrice = String.valueOf(shoe.getPrice());
@@ -305,6 +305,7 @@ class Server {
                                         newQuantity = reader.readLine();
                                     }
                                     synchronized (GATEKEEPER) {
+                                        seller.removeShoe(store, shoe, true);
                                         seller.addShoe(store, new Shoe(store, newShoeName, newShoeDescription, Double.parseDouble(newPrice),
                                                 Integer.parseInt(newQuantity)), true);
                                         MarketPlace.sellers.set(index, seller);
@@ -316,7 +317,6 @@ class Server {
                         if (sellerSelectedOption.equalsIgnoreCase("View your sales information")) {
                             String option = reader.readLine();
                             if (option.startsWith("c")) {
-                                System.out.println(seller.viewStatistics(true, 1));
                                 oos.writeObject(seller.viewStatistics(true, 1));
                                 oos.flush();
                             } else if (option.startsWith("s")) {
@@ -356,7 +356,12 @@ class Server {
                                 MarketPlace.sellers.set(index, seller);
                             }
                         }
-                        performAnotherActivity = reader.readLine();
+                        try {
+                            performAnotherActivity = reader.readLine();
+                        } catch (NullPointerException n) {
+                            // if client disconnects
+                            int num;
+                        }
                     } while (performAnotherActivity.equals("0"));
                 } else {
                     int index;
@@ -370,7 +375,7 @@ class Server {
                         }
                         customer = MarketPlace.customers.get(index); // GETS SPECIFIC SELLER
                     }
-                    String performAnotherActivity;
+                    String performAnotherActivity = "";
 
                     do  {
                         String customerChosenOption = reader.readLine();
@@ -437,8 +442,8 @@ class Server {
                                     writer.println(shoe.getName() + " successfully purchased!");
                                 }
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.SEARCH_MARKET)) {
                             String searchChoice = reader.readLine();
                             ArrayList<ArrayList<String>> marketList;
                             if (searchChoice.equalsIgnoreCase("Search by store name.")) {
@@ -448,7 +453,7 @@ class Server {
                                 for(Seller seller: MarketPlace.sellers) {
                                     for (Store store : seller.getStores()) {
                                         for (Shoe shoe : store.getShoes()) {
-                                            if (shoe.getStore().getName().equalsIgnoreCase(userChoiceStore)) {
+                                            if (shoe.getStore().getName().toLowerCase().contains(userChoiceStore.toLowerCase())) {
                                                 shoeInTheMarket.add(seller.getEmail());
                                                 shoeInTheMarket.add(store.getName());
                                                 shoeInTheMarket.add(shoe.getName());
@@ -480,7 +485,7 @@ class Server {
                                 for(Seller seller: MarketPlace.sellers) {
                                     for (Store store : seller.getStores()) {
                                         for (Shoe shoe : store.getShoes()) {
-                                            if (shoe.getName().equalsIgnoreCase(userChoiceShoe)) {
+                                            if (shoe.getName().toLowerCase().contains(userChoiceShoe.toLowerCase())) {
                                                 shoeInTheMarket.add(seller.getEmail());
                                                 shoeInTheMarket.add(store.getName());
                                                 shoeInTheMarket.add(shoe.getName());
@@ -545,7 +550,7 @@ class Server {
                                 for(Seller seller: MarketPlace.sellers) {
                                     for (Store store : seller.getStores()) {
                                         for (Shoe shoe : store.getShoes()) {
-                                            if (shoe.getPrice() == price) {
+                                            if (shoe.getPrice() <= price) {
                                                 shoeInTheMarket.add(seller.getEmail());
                                                 shoeInTheMarket.add(store.getName());
                                                 shoeInTheMarket.add(shoe.getName());
@@ -578,7 +583,7 @@ class Server {
                                 for(Seller seller: MarketPlace.sellers) {
                                     for (Store store : seller.getStores()) {
                                         for (Shoe shoe : store.getShoes()) {
-                                            if (shoe.getQuantity() == quantity) {
+                                            if (shoe.getQuantity() >= quantity) {
                                                 shoeInTheMarket.add(seller.getEmail());
                                                 shoeInTheMarket.add(store.getName());
                                                 shoeInTheMarket.add(shoe.getName());
@@ -638,37 +643,37 @@ class Server {
                                     writer.println(shoe.getName() + " successfully purchased!");
                                 }
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.REVIEW_PURCHASE_HISTORY)) {
                             synchronized (GATEKEEPER) {
-                                oos.writeObject(customer.viewPurchaseHistory(false));
+                                oos.writeObject(customer.viewPurchaseHistory(false, ""));
                                 MarketPlace.customers.set(index, customer);
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.EXPORT_SHOE)) {
                             String filePath = reader.readLine();
                             synchronized (GATEKEEPER) {
-                                writer.println(customer.viewPurchaseHistory(true));
+                                writer.println(customer.viewPurchaseHistory(true, filePath));
                                 MarketPlace.customers.set(index, customer);
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_EMAIL)) {
                             String newEmail = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setEmail(newEmail);
                                 MarketPlace.customers.set(index, customer);
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.CHANGE_CUSTOMER_PASSWORD)) {
                             String newPass = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 customer.setPassword(newPass);
                                 MarketPlace.customers.set(index, customer);
                             }
-
-                        } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
+                        }
+                        else if (customerChosenOption.equalsIgnoreCase(MarketPlace.PURCHASE_SHOE)) {
                             ArrayList<ArrayList<String>> marketList = new ArrayList<>();
-                            ArrayList<String> shoeInTheMarket;
+                            ArrayList<String> shoeInTheMarket = new ArrayList<>();
                             for (Seller seller : MarketPlace.sellers) {
                                 for (Store store : seller.getStores()) {
                                     for (Shoe shoe : store.getShoes()) {
@@ -726,7 +731,6 @@ class Server {
                                 customer.purchase(shoe, store, Integer.parseInt(quantity));
                                 writer.println(shoe.getName() + " successfully purchased!");
                             }
-
                         } else if (customerChosenOption.equalsIgnoreCase(MarketPlace.VIEW_MARKET_STATISTICS)) {
                             String option = reader.readLine();
                             if (option.equals("No")) {
@@ -741,21 +745,27 @@ class Server {
                             }
                         }
                         performAnotherActivity = reader.readLine();
+                        System.out.println(performAnotherActivity);
                     } while (performAnotherActivity.equals("0"));
 
                 }
-            } catch (IOException io) {
-                JOptionPane.showMessageDialog(null, "Error running ClientHandler.");
+
+
+            } catch (IOException e) {
+               int num;
+            } catch (NullPointerException n) {
+                int num;
             }
         }
     }
+
 
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(1234);
             Server server = new Server(serverSocket);
             server.startServer();
-        } catch (IOException io) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error starting server");
         }
     }
