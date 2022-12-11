@@ -533,6 +533,7 @@ public class Customer {
         this.totalAmountPurchased += amount;
         this.purchaseHistory.add(shoe);
 
+
         // add to this Customer object's arrayList of previously purchased
     }
 
