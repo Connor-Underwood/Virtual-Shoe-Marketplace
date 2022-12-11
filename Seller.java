@@ -469,69 +469,162 @@ public class Seller {
         // product1,product2,product3
         // Store 2 == 25 sales
         if (sort) {
-            ArrayList<Customer> customers = new ArrayList<>();
             if (sortBy == 1) {
-                for (int i = 0; i < stores.size(); i++) {
-                    customers.addAll(stores.get(i).getCustomers());
-                }
-                ArrayList<Customer> newList = new ArrayList<>();
-                for (Customer customer : customers) {
-                    if (!newList.contains(customer)) {
-                        newList.add(customer);
-                    }
-                }
-                newList.sort(Comparator.comparingInt(Customer::getTotalAmount));
-                if (newList.size() != 0) {
-                    String s = "";
-                    int count = 1;
-                    for (int i = newList.size() - 1; i >= 0; i--) {
-                        s += newList.get(i).getEmail() + " -- " + newList.get(i).getTotalAmount() + " Purchases Made." + "\n";
-                        count++;
-                    }
-                    return s;
-                } else {
-                    return "You have no customers from any of your stores.";
-                }
-            } else {
-                stores.sort(Comparator.comparingInt(Store::getSales));
-                if (stores.size() != 0) {
-                    String s = "";
-                    for (int i = stores.size() - 1; i >= 0; i--) {
-                        s += stores.get(i).getName() + ": " + stores.get(i).getSales() + " Sales Made." + "\n";
-                    }
-                    return s;
-                } else {
-                    return "You have no stores yet.";
-                }
-            }
-        } else {
-            // Data will include a list of customers with the number of
-            // items that they have purchased and a list of products with the number of sales.
-            // Store 1:
-            // Customer 1: 50 sales --> product1, product2, product3
-            String s = "";
-            for (int i = 0; i < stores.size(); i++) {
-                s += "Store " + (i + 1) + ": " + stores.get(i).getName() + " -- Total Sales: " + stores.get(i).getSales() + "\n";
-                if (stores.get(i).getCustomers().size() != 0) {
-                    for (int j = 0; j < stores.get(i).getCustomers().size(); j++) {
-                        s += "Customer " + (j + 1) + ": " + stores.get(i).getCustomers().get(j).getEmail() + "\n";
-                        for (int k = 0; k < stores.get(i).getCustomers().get(j).getPurchaseHistory().size(); k++) {
-                            if (k == stores.get(i).getCustomers().get(j).getPurchaseHistory().size() -1 && i != stores.size() -1) {
-                                s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n----------\n";
+                ArrayList<String> customers = new ArrayList<>();
+                // {customerPin:4000,customerPin:3000}
+                try (BufferedReader reader = new BufferedReader(new FileReader("stores.csv"))) {
+                    String line = "";
+                    while ((line = reader.readLine()) != null) {
+                        if (line.contains(this.pin)) {
+                            String[] arr = line.split(",");
+                            boolean inList = false;
+                            int index = -1;
+                            for (int i = 0; i < customers.size(); i++) {
+                                if (customers.get(i).split(":")[0].equals(arr[1])) {
+                                    inList = true;
+                                    index = i;
+                                }
+                            }
+                            if (inList) {
+                                int newQuantity = Integer.parseInt(customers.get(index).split(":")[1]) + Integer.parseInt(arr[9]);
+                                String newString = customers.get(index).split(":")[0] + ":" + newQuantity;
+                                customers.set(index, newString);
                             } else {
-                                s += "[" + stores.get(i).getCustomers().get(j).getPurchaseHistory().get(k).getName() + "] " + "\n";
+                                customers.add(arr[1] + ":" + arr[9]);
                             }
                         }
                     }
+                } catch (IOException io) {
+                    return null;
+                }
+                for (int i = 0; i < customers.size() - 1; i++)
+                {
+                    int index = i;
+                    for (int j = i + 1; j < customers.size(); j++){
+                        if (Integer.parseInt(customers.get(j).split(":")[1]) > Integer.parseInt(customers.get(index).split(":")[1])){
+                            index = j;//searching for lowest index
+                        }
+                    }
+                    String smallerNumber = customers.get(index);
+                    customers.set(index, customers.get(i));
+                    customers.set(i, smallerNumber);
+                }
+                if (customers.isEmpty()) {
+                    return "No Customers In Any Of Your Stores";
                 } else {
-                    if (i != stores.size() -1 ) {
-                        s += "No Customers Yet!\n----------\n";
+                    String s = "";
+                    for (int i = 0; i < customers.size(); i++) {
+                        s += customers.get(i).split(":")[0] + " Total Sales: " + customers.get(i).split(":")[1] + "\n";
+                    } // debug
+
+                    return s;
+                }
+            } else {
+                ArrayList<String> storeNames = new ArrayList<>();
+                // {store1:TotalSales,store2:TotalSales}
+                try (BufferedReader reader = new BufferedReader(new FileReader("stores.csv"))) {
+                    String line = "";
+                    while ((line = reader.readLine()) != null) {
+                        if (line.contains(this.pin)) {
+                            String[] arr = line.split(",");
+                            boolean inList = false;
+                            int index = -1;
+                            for (int i = 0; i < storeNames.size(); i++) {
+                                if (storeNames.get(i).split(":")[0].equals(arr[6])) {
+                                    inList = true;
+                                    index = i;
+                                }
+                            }
+                            if (inList) {
+                                int newQuantity = Integer.parseInt(storeNames.get(index).split(":")[1]) + Integer.parseInt(arr[9]);
+                                String newString = storeNames.get(index).split(":")[0] + ":" + newQuantity;
+                                storeNames.set(index, newString);
+                            } else {
+                                storeNames.add(arr[6] + ":" + arr[9]);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < storeNames.size() - 1; i++) {
+                        int index = i;
+                        for (int j = i + 1; j < storeNames.size(); j++){
+                            if (Integer.parseInt(storeNames.get(j).split(":")[1]) > Integer.parseInt(storeNames.get(index).split(":")[1])){
+                                index = j;//searching for lowest index
+                            }
+                        }
+                        String smallerNumber = storeNames.get(index);
+                        storeNames.set(index, storeNames.get(i));
+                        storeNames.set(i, smallerNumber);
+                    }
+
+                    if (storeNames.isEmpty()) {
+                        return "You have no sales from any of your stores!";
                     } else {
-                        s += "No Customers Yet!";
+                        String s = "";
+                        for (int i = 0; i < storeNames.size(); i++) {
+                            s += storeNames.get(i).split(":")[0] + " Total Sales: " + storeNames.get(i).split(":")[1] + "\n";
+                        }
+                        return s;
+                    }
+                } catch (IOException io) {
+                    return null;
+                }
+            }
+        } else {
+            ArrayList<String> allInfo = new ArrayList<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader("stores.csv"))) {
+                String line = "";
+                // arraylist of {[storeName:totalSales:customer1:customer2:customer3],[storeName2:totalSales:customer1:customer2]}
+                while ((line = reader.readLine()) != null) {
+                    if (line.contains(this.pin)) {
+                        String[] arr = line.split(",");
+                        boolean storeInList = false;
+                        int customerIndex = -1;
+                        int storeIndex = -1;
+                        for (int i = 0; i < allInfo.size(); i++) {
+                            if (allInfo.get(i).split(":")[0].equals(arr[6])) {
+                                storeInList = true;
+                                storeIndex = i;
+                            }
+//                            String[] customers = allInfo.get(i).split(":");
+//                            for (int j = 2; j < customers.length; j++) {
+//                                if (customers[i].equalsIgnoreCase(arr[1])) {
+//                                    customerIndex = j;
+//                                }
+//                            }
+                        }
+                        if (storeInList) {
+                            int newQuantity = Integer.parseInt(allInfo.get(storeIndex).split(":")[1]) + Integer.parseInt(arr[9]);
+                            String newString = allInfo.get(storeIndex).split(":")[0] + ":" + newQuantity + ":";
+                            String[] array = allInfo.get(storeIndex).split(":");
+                            for (int i = 2; i < array.length; i++) {
+                                newString += array[i] + ":";
+                            }
+                            newString += arr[1];
+                            allInfo.set(storeIndex, newString);
+
+                        } else {
+                           allInfo.add(arr[6] + ":" + arr[9] + ":" + arr[1]);
+                        }
+                    }
+                }
+
+            } catch (IOException io) {
+                return null;
+            }
+            String string = "";
+            for (int i = 0; i < allInfo.size(); i++) {
+                string += allInfo.get(i).split(":")[0] + " made " + allInfo.get(i).split(":")[1] + " Total Sales\n";
+                string += "Customers: ";
+                String[] newArr = allInfo.get(i).split(":");
+                for (int j = 2; j < newArr.length; j++) {
+                    if (j == newArr.length -1) {
+                        string += newArr[j] + "\n";
+                    } else {
+                        string += newArr[j] + "  ";
                     }
                 }
             }
-            return s;
+            return string;
         }
     }
 
