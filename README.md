@@ -766,7 +766,7 @@ Fields:
 
 **<span style="text-decoration:underline;">Files</span>**
 
-Format of some specified files: In many cases the files are of the format .csv each one has a different format and each value separated by a comma means something different.
+Format of some specified files: In many cases the files are of the format .csv each one has a different format and each value separated by a comma means something different. We have provided many different example files with our project to give an understanding of how the formatting is done. The tests can also be perfomred with the provided files.
 
 **Accounts csv file**: this file stores only the details of each account of each user
 
