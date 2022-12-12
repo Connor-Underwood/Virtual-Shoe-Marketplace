@@ -844,7 +844,6 @@ public class Client {
                                 if (num == CLOSED_OPTION) {
                                     return;
                                 }
-
                             } else {
                                 num = showConfirmDialog(null, "Unable to import your products to " +
                                                 "the market.",
