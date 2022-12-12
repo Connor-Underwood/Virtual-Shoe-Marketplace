@@ -346,8 +346,9 @@ class Server {
                             String filepath = reader.readLine();
                             synchronized (GATEKEEPER) {
                                 writer.println(seller.importProducts(filepath));
-                                MarketPlace.sellers.set(index, seller);
+                                MarketPlace.sellers.set(index,seller);
                             }
+
                         }
                         if (sellerSelectedOption.equalsIgnoreCase("Export products to a file")) {
                             String fileName = reader.readLine();
@@ -745,16 +746,13 @@ class Server {
                             }
                         }
                         performAnotherActivity = reader.readLine();
-                        System.out.println(performAnotherActivity);
                     } while (performAnotherActivity.equals("0"));
 
                 }
 
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                int num;
-            } catch (NullPointerException n) {
-                int num;
             }
         }
     }
