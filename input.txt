@@ -1,0 +1,4 @@
+Nike,Air Force 1's,99.99,10
+Puma,Puma 4's,59.99,15
+Reebok,Crocodiles,25.55,15
+Adidas,adidas Airboost,15.99,100
